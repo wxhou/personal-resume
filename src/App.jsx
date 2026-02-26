@@ -10,7 +10,7 @@ import {
 const personalInfo = {
   name: '侯伟轩',
   title: 'AI应用工程师',
-  salary: '20K',
+  salary: '18K-20K',
   phone: '18291900215',
   email: 'hooupythonic@gmail.com',
   location: '西安市周至县',
