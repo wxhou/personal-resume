@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import html2pdf from 'html2pdf.js'
 import {
   Phone, Mail, MapPin, Github, User, GraduationCap,
   Cpu, Code, Wrench, Boxes, Briefcase,
@@ -165,10 +166,37 @@ function ProjectCard({ project, index }) {
 }
 
 export default function App() {
+  const exportPDF = () => {
+    const element = document.getElementById('resume-a4')
+    const opt = {
+      margin: 0,
+      filename: '个人简历.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+    html2pdf().set(opt).from(element).save()
+  }
+
   return (
     <div className="min-h-screen py-8 px-4">
+      {/* Export Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={exportPDF}
+          className="px-4 py-2 bg-brand-orange text-white rounded-lg font-medium text-sm shadow-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          导出PDF
+        </motion.button>
+      </div>
+
       {/* A4 Container */}
-      <div className="a4-container">
+      <div id="resume-a4" className="a4-container">
         {/* A4 Background Decorations */}
         <div className="a4-bg-decoration a4-bg-decoration--top-right"></div>
         <div className="a4-bg-decoration a4-bg-decoration--bottom-left"></div>
