@@ -201,40 +201,27 @@ export default function App() {
     const decorations = element.querySelectorAll('.a4-bg-decoration, .a4-grid-pattern, .a4-header-decoration, [class*="shadow"]')
     decorations.forEach(el => el.remove())
 
-    // Get inner HTML and wrap with Word-compatible HTML
+    // Get inner HTML and wrap with proper Word format
     const htmlContent = `
-      <!DOCTYPE html>
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <meta charset="utf-8">
-        <title>个人简历</title>
-        <!--[if gte mso 9]>
-        <xml>
-          <w:WordDocument>
-            <w:View>Print</w:View>
-          </w:WordDocument>
-        <![endif]-->
-        <style>
-          body { font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; margin: 20px; }
-          * { box-sizing: border-box; }
-          .a4-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-          h1 { font-size: 28px; font-weight: bold; text-align: center; }
-          h2 { font-size: 16px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 15px; }
-          h3 { font-size: 14px; font-weight: bold; }
-          p { font-size: 12px; color: #666; }
-          .tag { display: inline-block; padding: 2px 8px; margin: 2px; border: 1px solid #ddd; border-radius: 10px; font-size: 11px; }
-          .contact { text-align: center; margin: 20px 0; }
-          .contact span { margin: 0 10px; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        ${element.innerHTML}
-      </body>
-      </html>
-    `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>个人简历</title>
+<style>
+body { font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 0; padding: 20px; }
+h1 { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+h2 { font-size: 14px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 12px; }
+h3 { font-size: 12px; font-weight: bold; margin: 8px 0 4px; }
+p { font-size: 11px; color: #666; margin: 3px 0; }
+</style>
+</head>
+<body>
+${element.innerHTML}
+</body>
+</html>`
 
-    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' })
+    // Use proper MIME type for Word
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
