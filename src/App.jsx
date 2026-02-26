@@ -2,13 +2,15 @@ import { motion } from 'framer-motion'
 import {
   Phone, Mail, MapPin, Github, User, GraduationCap,
   Cpu, Code, Wrench, Boxes, Briefcase,
-  Rocket, Zap, Package, ChevronRight, BookOpen, Link
+  Rocket, Zap, Package, ChevronRight, BookOpen, Link,
+  Star, CheckCircle
 } from 'lucide-react'
 
 // Resume Data
 const personalInfo = {
   name: '侯伟轩',
   title: 'AI应用工程师',
+  salary: '20K',
   phone: '18291900215',
   email: 'hooupythonic@gmail.com',
   location: '西安市周至县',
@@ -132,6 +134,9 @@ function SkillTag({ children, delay = 0 }) {
 }
 
 function ProjectCard({ project, index }) {
+  const icons = [CheckCircle, Star, CheckCircle, Star]
+  const Icon = icons[index % icons.length]
+
   return (
     <Card delay={0.4 + index * 0.1} className="group">
       <div className="flex items-start justify-between mb-2">
@@ -150,7 +155,7 @@ function ProjectCard({ project, index }) {
             transition={{ delay: 0.5 + index * 0.1 + i * 0.05 }}
             className="text-xs text-gray-500 flex items-start gap-1.5"
           >
-            <ChevronRight size={12} className="text-brand-orange mt-0.5 flex-shrink-0" />
+            <Icon size={12} className="text-brand-orange mt-0.5 flex-shrink-0" />
             <span>{detail}</span>
           </motion.li>
         ))}
@@ -177,10 +182,19 @@ export default function App() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 pb-6 border-b-2 border-gray-100"
         >
+          {/* Avatar */}
+          <div className="mx-auto w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orange-dark flex items-center justify-center shadow-lg">
+            <User size={40} className="text-white" />
+          </div>
+
           <h1 className="text-4xl font-bold text-gray-900 mb-2 font-display tracking-tight">
             {personalInfo.name}
           </h1>
-          <p className="text-xl text-brand-orange font-medium mb-4">{personalInfo.title}</p>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <p className="text-xl text-brand-orange font-medium">{personalInfo.title}</p>
+            <span className="text-gray-300">|</span>
+            <p className="text-lg text-gray-600 font-medium">期望薪资 {personalInfo.salary}</p>
+          </div>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
             <motion.a
               href={`tel:${personalInfo.phone}`}
