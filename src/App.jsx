@@ -169,11 +169,21 @@ export default function App() {
   const exportPDF = () => {
     const element = document.getElementById('resume-a4')
     const opt = {
-      margin: 0,
+      margin: 3,
       filename: '个人简历.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'png', quality: 1 },
+      html2canvas: {
+        scale: 3,
+        useCORS: true,
+        letterRendering: true,
+        logging: false,
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     }
     html2pdf().set(opt).from(element).save()
   }
