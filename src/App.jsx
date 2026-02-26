@@ -194,20 +194,80 @@ export default function App() {
     html2pdf().set(opt).from(element).save()
   }
 
+  const exportWord = () => {
+    const element = document.getElementById('resume-a4').cloneNode(true)
+
+    // Remove background decorations for clean export
+    const decorations = element.querySelectorAll('.a4-bg-decoration, .a4-grid-pattern, .a4-header-decoration, [class*="shadow"]')
+    decorations.forEach(el => el.remove())
+
+    // Get inner HTML and wrap with Word-compatible HTML
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta charset="utf-8">
+        <title>个人简历</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+          </w:WordDocument>
+        <![endif]-->
+        <style>
+          body { font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; margin: 20px; }
+          * { box-sizing: border-box; }
+          .a4-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+          h1 { font-size: 28px; font-weight: bold; text-align: center; }
+          h2 { font-size: 16px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 15px; }
+          h3 { font-size: 14px; font-weight: bold; }
+          p { font-size: 12px; color: #666; }
+          .tag { display: inline-block; padding: 2px 8px; margin: 2px; border: 1px solid #ddd; border-radius: 10px; font-size: 11px; }
+          .contact { text-align: center; margin: 20px 0; }
+          .contact span { margin: 0 10px; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        ${element.innerHTML}
+      </body>
+      </html>
+    `
+
+    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = '个人简历.doc'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="min-h-screen py-8 px-4">
-      {/* Export Button */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Export Buttons */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={exportPDF}
-          className="px-4 py-2 bg-brand-orange text-white rounded-lg font-medium text-sm shadow-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium text-sm shadow-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          导出PDF
+          PDF
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={exportWord}
+          className="px-4 py-2 bg-brand-orange text-white rounded-lg font-medium text-sm shadow-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Word
         </motion.button>
       </div>
 
