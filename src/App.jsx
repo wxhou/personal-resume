@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import {
   Phone, Mail, MapPin, Github, User, GraduationCap,
   Cpu, Code, Wrench, Boxes, Briefcase,
-  Rocket, Zap, Package, ChevronRight
+  Rocket, Zap, Package, ChevronRight, BookOpen, Link
 } from 'lucide-react'
 
 // Resume Data
@@ -283,6 +283,31 @@ export default function App() {
                 {skills.basic.map((skill, index) => (
                   <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
                 ))}
+              </div>
+            </Card>
+
+            {/* Blog */}
+            <Card delay={0.55}>
+              <SectionTitle icon={<BookOpen size={18} />} title="个人博客" delay={0.55} />
+              <div className="space-y-3">
+                <motion.a
+                  href="https://www.cnblogs.com/wxhou"
+                  target="_blank"
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
+                >
+                  <Link size={14} />
+                  <span>博客园</span>
+                </motion.a>
+                <motion.a
+                  href="https://gitee.com/wxhou"
+                  target="_blank"
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
+                >
+                  <Link size={14} />
+                  <span>Gitee</span>
+                </motion.a>
               </div>
             </Card>
           </div>
