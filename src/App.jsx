@@ -169,15 +169,21 @@ export default function App() {
   const exportPDF = () => {
     const element = document.getElementById('resume-a4')
     const opt = {
-      margin: 2,
+      margin: 0,
       filename: '个人简历.pdf',
       image: { type: 'png', quality: 1 },
       html2canvas: {
-        scale: 4,
+        scale: 2,
         useCORS: true,
         letterRendering: true,
         logging: false,
-        windowWidth: 794
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('resume-a4')
+          if (clonedElement) {
+            clonedElement.style.margin = '0'
+            clonedElement.style.boxShadow = 'none'
+          }
+        }
       },
       jsPDF: {
         unit: 'mm',
