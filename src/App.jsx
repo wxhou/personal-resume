@@ -194,7 +194,7 @@ export default function App() {
             <p className="text-xl text-brand-orange font-medium">{personalInfo.title}</p>
             <span className="text-gray-300">|</span>
             <p className="text-lg text-gray-600 font-medium">
-              月薪 ¥{personalInfo.salary}
+              ¥{personalInfo.salary}
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
