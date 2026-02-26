@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import {
   Phone, Mail, MapPin, Github, User, GraduationCap,
-  Cpu, Code, FlaskConical, Wrench, Boxes, Briefcase,
+  Cpu, Code, Wrench, Boxes, Briefcase,
   Rocket, Zap, Package, ChevronRight
 } from 'lucide-react'
 
@@ -23,7 +23,6 @@ const personalInfo = {
 const skills = {
   ai: ['AI编程', 'LangChain', 'LangGraph', 'Dify', 'Prompt工程', 'RAG技术', 'AI Agent', 'MCP'],
   backend: ['FastAPI', 'Flask', 'RESTful API', 'Linux', 'SQL'],
-  testing: ['测试理论', '用例设计', '测试报告', '缺陷管理'],
   automation: ['Python + Requests', 'Selenium', 'Airtest', 'Locust', 'Jmeter'],
   basic: ['Python', 'Git']
 }
@@ -262,16 +261,6 @@ export default function App() {
               <SectionTitle icon={<Code size={18} />} title="后端开发" delay={0.35} />
               <div className="flex flex-wrap gap-2">
                 {skills.backend.map((skill, index) => (
-                  <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
-                ))}
-              </div>
-            </Card>
-
-            {/* Skills - Testing */}
-            <Card delay={0.4}>
-              <SectionTitle icon={<FlaskConical size={18} />} title="测试开发" delay={0.4} />
-              <div className="flex flex-wrap gap-2">
-                {skills.testing.map((skill, index) => (
                   <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
                 ))}
               </div>
