@@ -3,7 +3,7 @@ import {
   Phone, Mail, MapPin, Github, User, GraduationCap,
   Cpu, Code, Wrench, Boxes, Briefcase,
   Rocket, Zap, Package, ChevronRight, BookOpen, Link,
-  Star, CheckCircle, DollarSign
+  Star, CheckCircle
 } from 'lucide-react'
 
 // Resume Data
@@ -193,9 +193,8 @@ export default function App() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <p className="text-xl text-brand-orange font-medium">{personalInfo.title}</p>
             <span className="text-gray-300">|</span>
-            <p className="text-lg text-gray-600 font-medium flex items-center gap-1">
-              <DollarSign size={18} className="text-brand-orange" />
-              {personalInfo.salary}
+            <p className="text-lg text-gray-600 font-medium">
+              月薪 ¥{personalInfo.salary}
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
