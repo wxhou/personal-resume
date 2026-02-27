@@ -97,7 +97,7 @@ function Card({ children, className = "", delay = 0 }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: "easeOut" }}
-      className={`bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 card-bg ${className}`}
+      className={`bg-white rounded-2xl p-4 shadow-card hover:shadow-card-hover transition-all duration-300 card-bg ${className}`}
     >
       {children}
     </motion.div>
@@ -169,7 +169,7 @@ export default function App() {
   const exportPDF = () => {
     const element = document.getElementById('resume-a4')
     const opt = {
-      margin: 5,
+      margin: 2,
       filename: '个人简历.pdf',
       image: { type: 'png', quality: 1 },
       html2canvas: {
@@ -177,6 +177,7 @@ export default function App() {
         useCORS: true,
         letterRendering: true,
         logging: false,
+        windowWidth: 794,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('resume-a4')
           if (clonedElement) {
@@ -225,7 +226,7 @@ export default function App() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 pb-6 border-b-2 border-gray-100"
+          className="text-center mb-6 pb-4 border-b-2 border-gray-100"
         >
           {/* Avatar */}
           <div className="mx-auto w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orange-dark flex items-center justify-center shadow-lg">
@@ -276,9 +277,9 @@ export default function App() {
         </motion.div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Left Column */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* About Me */}
             <Card delay={0.1}>
               <SectionTitle icon={<User size={18} />} title="关于我" delay={0.1} />
@@ -374,7 +375,7 @@ export default function App() {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Experience */}
             <Card delay={0.15}>
               <SectionTitle icon={<Briefcase size={18} />} title="工作经历" delay={0.15} />
@@ -399,7 +400,7 @@ export default function App() {
             {/* Projects */}
             <div>
               <SectionTitle icon={<Rocket size={18} />} title="项目经验" delay={0.2} />
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {projects.map((project, index) => (
                   <ProjectCard key={project.name} project={project} index={index} />
                 ))}
@@ -413,7 +414,7 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-8 pt-6 border-t border-gray-100 text-center"
+          className="mt-6 pt-4 border-t border-gray-100 text-center"
         >
           <div className="flex justify-center gap-4 mb-4">
             <motion.a

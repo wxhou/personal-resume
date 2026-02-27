@@ -29,7 +29,7 @@ body {
   margin: 2rem auto;
   background: #ffffff;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  padding: 20mm;
+  padding: 15mm;
   position: relative;
   overflow: hidden;
 }
@@ -94,7 +94,7 @@ body {
 /* Header decorative element */
 .a4-header-decoration {
   position: absolute;
-  top: 15mm;
+  top: 12mm;
   left: 15mm;
   right: 15mm;
   height: 2px;
