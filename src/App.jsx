@@ -133,9 +133,9 @@ function ThemeSwitcher({ theme, onThemeChange }) {
           onClick={() => onThemeChange(t.id)}
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
               const idx = THEMES.findIndex(x => x.id === theme)
-              const next = e.key === 'ArrowRight'
+              const next = e.key === 'ArrowDown'
                 ? THEMES[(idx + 1) % THEMES.length]
                 : THEMES[(idx - 1 + THEMES.length) % THEMES.length]
               onThemeChange(next.id)
@@ -212,11 +212,11 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-page)', transition: 'background 300ms ease-out' }}>
-      {/* Theme Switcher */}
+    <div className="min-h-screen pl-[56px]" style={{ background: 'var(--bg-page)', transition: 'background 300ms ease-out' }}>
+      {/* Theme Switcher - Left Sidebar */}
       <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
 
-      {/* Export Buttons */}
+      {/* Export Buttons - Top Right */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <motion.button
           whileHover={{ scale: 1.03 }}

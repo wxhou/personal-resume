@@ -814,58 +814,76 @@ body {
   color: var(--text-muted);
 }
 
-/* ─── Theme Switcher ─── */
+/* ─── Theme Switcher (Left Sidebar) ─── */
 .theme-switcher {
   position: fixed;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 100;
   display: flex;
-  gap: 2px;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+  transition: var(--page-transition);
+}
+:root[data-theme="dark"] .theme-switcher {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  padding: 3px;
-  border-radius: 6px;
-  backdrop-filter: blur(8px);
-  transition: var(--page-transition);
+  border-left: none;
+}
+:root[data-theme="editorial"] .theme-switcher {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: none;
+}
+:root[data-theme="geometric"] .theme-switcher {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: none;
 }
 .theme-switcher__btn {
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 400;
-  letter-spacing: 0.05em;
-  padding: 5px 12px;
+  letter-spacing: 0.08em;
+  padding: 10px 8px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   background: transparent;
   color: var(--text-muted);
   transition: all 200ms ease;
   line-height: 1;
+  text-align: center;
+  min-width: 48px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
 }
 .theme-switcher__btn:hover {
   color: var(--text-primary);
   background: var(--border);
 }
 .theme-switcher__btn--active {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  font-weight: 500;
+  color: var(--accent);
+  font-weight: 600;
 }
 :root[data-theme="dark"] .theme-switcher__btn--active {
-  background: rgba(255,255,255,0.08);
-  color: var(--accent);
-  border-bottom: 1.5px solid var(--accent);
+  background: rgba(245,158,11,0.12);
+  border-left: 2px solid var(--accent);
 }
 :root[data-theme="editorial"] .theme-switcher__btn--active {
-  color: var(--accent);
-  font-weight: 500;
+  background: rgba(220,38,38,0.08);
+  border-left: 2px solid var(--accent);
 }
 :root[data-theme="geometric"] .theme-switcher__btn--active {
-  background: var(--accent);
-  color: #fff;
-  border-radius: 0;
+  background: rgba(30,58,95,0.1);
+  border-left: 2px solid var(--accent);
+}
+:root[data-theme="geometric"] .theme-switcher__btn {
+  letter-spacing: 0.15em;
 }
 
 /* ─── Export Buttons ─── */
