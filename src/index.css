@@ -52,18 +52,18 @@ body {
 }
 
 :root[data-theme="editorial"] {
-  --bg-page: #F9F7F4;
-  --bg-primary: #F9F7F4;
-  --bg-surface: #F5F2ED;
-  --bg-elevated: #F0EDE7;
+  --bg-page: #FAFAF8;
+  --bg-primary: #FAFAF8;
+  --bg-surface: #F5F3EF;
+  --bg-elevated: #F0EDE8;
   --text-primary: #1C1917;
   --text-secondary: #57534E;
   --text-muted: #A8A29E;
-  --accent: #DC2626;
-  --accent-hover: #B91C1C;
-  --accent-subtle: rgba(220, 38, 38, 0.08);
-  --border: rgba(28, 25, 23, 0.1);
-  --border-hover: rgba(28, 25, 23, 0.25);
+  --accent: #7C3AED;
+  --accent-hover: #6D28D9;
+  --accent-subtle: rgba(124, 58, 237, 0.06);
+  --border: rgba(28, 25, 23, 0.08);
+  --border-hover: rgba(28, 25, 23, 0.2);
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'Outfit', sans-serif;
@@ -166,30 +166,33 @@ body {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.02;
+  opacity: 0.015;
   pointer-events: none;
 }
 
-/* Editorial: corner marks */
+/* Editorial: elegant corner marks */
 :root[data-theme="editorial"] .a4-corner-mark {
-  border-color: rgba(120, 90, 60, 0.2);
+  border-color: rgba(124, 58, 237, 0.1);
+  width: 20px;
+  height: 20px;
 }
 
-/* Geometric: diagonal lines SVG background */
+/* Geometric: minimal dot grid background */
 :root[data-theme="geometric"] .a4-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 L60 0' stroke='rgba(30,58,95,0.04)' stroke-width='1'/%3E%3C/svg%3E");
-  background-size: 60px 60px;
+  background-image: radial-gradient(circle, rgba(30,58,95,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
   z-index: 0;
 }
 
 /* Geometric: corner marks */
 :root[data-theme="geometric"] .a4-corner-mark {
-  border-color: rgba(15, 23, 42, 0.15);
+  border-color: rgba(30, 58, 95, 0.15);
+  width: 20px;
+  height: 20px;
 }
 
 /* Original: sidebar */
@@ -349,7 +352,11 @@ body {
   border-radius: 9999px;
 }
 :root[data-theme="geometric"] .avatar-wrap {
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border-radius: 10px;
+}
+:root[data-theme="geometric"] .avatar-inner {
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1E3A5F, #0F172A);
 }
 :root[data-theme="original"] .avatar-wrap {
   border-radius: 9999px;
@@ -377,9 +384,8 @@ body {
   border-radius: 0;
 }
 :root[data-theme="geometric"] .avatar-ring {
-  border-radius: 0;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  transform: scale(1.12);
+  border-radius: 10px;
+  border: 2px solid var(--accent);
 }
 .avatar-inner {
   position: absolute;
@@ -405,16 +411,14 @@ body {
 :root[data-theme="editorial"] .avatar-inner {
   background: linear-gradient(145deg, #E8DFD0, #D4C9B8);
 }
-.avatar-monogram {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1;
-  transition: color 300ms ease-out;
+:root[data-theme="editorial"] .avatar-ring {
+  border: 2px solid var(--accent);
+  border-color: #7C3AED;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
 :root[data-theme="editorial"] .avatar-monogram {
   color: #5C4A32;
+  font-size: 20px;
 }
 
 /* ─── Contact Links ─── */
@@ -480,7 +484,7 @@ body {
 }
 :root[data-theme="geometric"] .skill-tag:hover {
   background: var(--accent);
-  color: white;
+  color: #fff;
   border-color: var(--accent);
 }
 /* Original: skill tag - gradient orange pills */
@@ -670,7 +674,10 @@ body {
   transition: color 300ms ease-out;
 }
 :root[data-theme="geometric"] .geometric-index {
-  color: rgba(30,58,95,0.08);
+  color: rgba(30,58,95,0.12);
+  font-size: 32px;
+  font-weight: 700;
+  top: 2mm;
 }
 
 /* ─── Timeline ─── */
@@ -715,9 +722,9 @@ body {
   border-color: var(--accent);
 }
 :root[data-theme="geometric"] .timeline-dot {
-  border-radius: 0;
-  width: 6px;
-  height: 6px;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
 }
 :root[data-theme="geometric"] .timeline-dot--active {
   background: var(--accent);
@@ -849,6 +856,63 @@ body {
 }
 :root[data-theme="editorial"] .about-text {
   font-size: 13px;
+}
+/* Editorial: elegant section label - no trailing line */
+:root[data-theme="editorial"] .section-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: lowercase;
+}
+:root[data-theme="editorial"] .section-label::after {
+  display: none;
+}
+/* Editorial: about section with decorative open-quote */
+:root[data-theme="editorial"] .about-text::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: var(--accent);
+  opacity: 0.4;
+  line-height: 0;
+  vertical-align: -0.3em;
+  margin-right: 2px;
+}
+/* Editorial: timeline company in accent color */
+:root[data-theme="editorial"] .timeline-company {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  color: var(--accent);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+/* Editorial: project card name larger serif */
+:root[data-theme="editorial"] .project-card__name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1C1917;
+}
+/* Editorial: project card desc italic */
+:root[data-theme="editorial"] .project-card__desc {
+  font-style: italic;
+  font-size: 12px;
+  color: #78716C;
+  font-family: 'Cormorant Garamond', serif;
+}
+/* Editorial: project detail em-dash in accent */
+:root[data-theme="editorial"] .project-card__detail::before {
+  color: var(--accent);
+  font-weight: 400;
+}
+/* Editorial: footer mark refined */
+:root[data-theme="editorial"] .footer-mark {
+  color: #A8A29E;
+  letter-spacing: 0.2em;
 }
 :root[data-theme="dark"] .about-text {
   font-family: var(--font-body);
@@ -1083,6 +1147,88 @@ body {
 }
 :root[data-theme="geometric"] .footer-mark {
   color: var(--text-muted);
+}
+/* Geometric: section label with accent bar */
+:root[data-theme="geometric"] .section-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+:root[data-theme="geometric"] .section-label::after {
+  background: var(--accent);
+  opacity: 0.2;
+}
+/* Geometric: about text */
+:root[data-theme="geometric"] .about-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #475569;
+}
+/* Geometric: edu-school */
+:root[data-theme="geometric"] .edu-school {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+/* Geometric: timeline title */
+:root[data-theme="geometric"] .timeline-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F172A;
+}
+/* Geometric: project name bold */
+:root[data-theme="geometric"] .project-card__name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+/* Geometric: project desc */
+:root[data-theme="geometric"] .project-card__desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #64748B;
+}
+/* Geometric: project detail */
+:root[data-theme="geometric"] .project-card__detail {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: #475569;
+}
+:root[data-theme="geometric"] .project-card__detail::before {
+  color: var(--accent);
+  font-weight: 700;
+}
+/* Geometric: contact link */
+:root[data-theme="geometric"] .contact-link {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #64748B;
+}
+/* Geometric: link item */
+:root[data-theme="geometric"] .link-item {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  color: #475569;
+}
+/* Geometric: avatar monogram */
+:root[data-theme="geometric"] .avatar-monogram {
+  color: #fff;
+  font-size: 18px;
+}
+/* Geometric: btn-cta primary */
+:root[data-theme="geometric"] .btn-cta--primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 :root[data-theme="original"] .footer-mark {
   color: #999;
