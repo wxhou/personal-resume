@@ -397,6 +397,15 @@ export default function App() {
                   <Link size={14} />
                   <span>Gitee</span>
                 </motion.a>
+                <motion.a
+                  href="https://wxhou.github.io/openspec-playwright/"
+                  target="_blank"
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
+                >
+                  <Link size={14} />
+                  <span>OpenSpec Playwright</span>
+                </motion.a>
               </div>
             </Card>
           </div>
