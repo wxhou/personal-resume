@@ -31,8 +31,8 @@ body {
   --bg-surface: #18181B;
   --bg-elevated: #27272A;
   --text-primary: #FAFAFA;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
+  --text-secondary: #C2C2C2;
+  --text-muted: #808080;
   --accent: #F59E0B;
   --accent-hover: #D97706;
   --accent-subtle: rgba(245, 158, 11, 0.1);
@@ -586,7 +586,8 @@ body {
 :root[data-theme="original"] .project-card__detail {
   font-family: 'Inter', sans-serif;
   font-size: 10px;
-  color: #888;
+  font-weight: 400;
+  color: #555;
 }
 :root[data-theme="original"] .project-card__detail::before {
   color: #FF6B35;
@@ -767,7 +768,7 @@ body {
   background: rgba(0,0,0,0.06);
 }
 :root[data-theme="original"] .timeline-dot {
-  border-color: #ccc;
+  border-color: #bbb;
   background: #fff;
 }
 :root[data-theme="original"] .timeline-dot--active {
@@ -784,12 +785,12 @@ body {
 :root[data-theme="original"] .timeline-company {
   font-family: 'Inter', sans-serif;
   font-size: 10px;
-  color: #888;
+  color: #666;
 }
 :root[data-theme="original"] .timeline-period {
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px;
-  color: #aaa;
+  color: #999;
 }
 .timeline-period {
   font-family: var(--font-mono);
@@ -862,13 +863,14 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 600;
-  color: #FF6B35;
+  color: #CC4400;
   letter-spacing: 0.1em;
 }
 :root[data-theme="original"] .about-text {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: #4A4A4A;
+  font-weight: 400;
+  color: #555;
 }
 
 /* ─── Education ─── */
@@ -997,7 +999,7 @@ body {
 :root[data-theme="original"] .header-salary {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: #888;
+  color: #666;
 }
 
 /* ─── CTA Buttons ─── */
@@ -1083,7 +1085,7 @@ body {
   color: var(--text-muted);
 }
 :root[data-theme="original"] .footer-mark {
-  color: #aaa;
+  color: #999;
 }
 
 /* ─── Theme Switcher (Left Sidebar) ─── */
