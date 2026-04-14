@@ -2,20 +2,19 @@ import { motion } from 'framer-motion'
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
 import {
-  Phone, Mail, MapPin, Github, User, GraduationCap,
-  Cpu, Code, Wrench, Boxes, Briefcase,
-  Rocket, Zap, Package, ChevronRight, BookOpen, Link,
-  Star, CheckCircle
+  Phone, Mail, MapPin, Github, GraduationCap,
+  Cpu, Code, Zap, Package, Briefcase,
+  Rocket, BookOpen, Link, ExternalLink,
 } from 'lucide-react'
 
-// Resume Data
+// ─── Resume Data ───────────────────────────────────────────
 const personalInfo = {
   name: '侯伟轩',
   title: 'AI应用工程师',
-  salary: '18K-20K',
+  salary: '¥18K – 20K',
   phone: '18291900215',
   email: 'hooupythonic@gmail.com',
-  location: '西安市周至县',
+  location: '西安',
   github: 'https://github.com/wxhou',
   education: {
     school: '陕西职业技术学院',
@@ -35,9 +34,9 @@ const experience = [
   {
     company: '西安云景智维科技有限公司',
     roles: [
-      { title: 'AI应用工程师', period: '2025 - 至今' },
-      { title: '项目经理', period: '2020 - 2024' },
-      { title: '测试开发工程师', period: '2018.11 - 2019' }
+      { title: 'AI应用工程师', period: '2025 – 至今', active: true },
+      { title: '项目经理', period: '2020 – 2024', active: false },
+      { title: '测试开发工程师', period: '2018.11 – 2019', active: false }
     ]
   }
 ]
@@ -77,7 +76,7 @@ const projects = [
     name: '光环商业信息发布系统',
     description: '重庆光环购物中心信息发布系统',
     details: [
-      '参与后端的API的开发工作',
+      '参与后端API的开发工作，进行部分模块的接口开发',
       '负责批量控制近百台设备的脚本开发',
       '日常版本更新迭代维护',
       '模拟现场环境，寻找系统响应瓶颈'
@@ -87,91 +86,41 @@ const projects = [
 
 const evaluations = [
   '做人真诚，做事认真负责',
-  '进取务实，善于学习新事物',
+  '进取务实，善于学习自我感兴趣的知识和事物，敢于主动承担自我的职责',
   '细节决定成败'
 ]
 
-// Components
-function Card({ children, className = "", delay = 0 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5, ease: "easeOut" }}
-      className={`bg-white rounded-2xl p-4 shadow-card hover:shadow-card-hover transition-all duration-300 card-bg ${className}`}
-    >
-      {children}
-    </motion.div>
-  )
+const personalLinks = [
+  { name: '博客园', url: 'https://www.cnblogs.com/wxhou' },
+  { name: 'Gitee', url: 'https://gitee.com/wxhou' },
+  { name: 'OpenSpec Playwright', url: 'https://wxhou.github.io/openspec-playwright/' },
+]
+
+// ─── Animation Variants ────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+  })
 }
 
-function SectionTitle({ icon, title, delay = 0 }) {
-  return (
-    <motion.h2
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: delay + 0.2, duration: 0.4 }}
-      className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
-    >
-      <span className="text-brand-orange">{icon}</span>
-      <span className="relative">
-        {title}
-        <span className="absolute -bottom-1 left-0 w-12 h-0.5 bg-brand-orange rounded-full"></span>
-      </span>
-    </motion.h2>
-  )
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    transition: { delay, duration: 0.5, ease: 'easeOut' }
+  })
 }
 
-function SkillTag({ children, delay = 0 }) {
-  return (
-    <motion.span
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: delay + 0.3, duration: 0.3 }}
-      className="inline-block px-3 py-1.5 bg-gradient-to-r from-brand-orange/10 to-brand-orange-light/10 border border-brand-orange/20 rounded-full text-sm text-gray-700 hover:bg-brand-orange/15 hover:border-brand-orange/40 transition-all cursor-default"
-    >
-      {children}
-    </motion.span>
-  )
-}
-
-function ProjectCard({ project, index }) {
-  const icons = [CheckCircle, Star, CheckCircle, Star]
-  const Icon = icons[index % icons.length]
-
-  return (
-    <Card delay={0.4 + index * 0.1} className="group">
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-gray-800 group-hover:text-brand-orange transition-colors">
-          {project.name}
-        </h3>
-        <span className="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-hover:opacity-100 transition-opacity"></span>
-      </div>
-      <p className="text-gray-600 text-sm mb-3">{project.description}</p>
-      <ul className="space-y-1">
-        {project.details.map((detail, i) => (
-          <motion.li
-            key={i}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 + index * 0.1 + i * 0.05 }}
-            className="text-xs text-gray-500 flex items-start gap-1.5"
-          >
-            <Icon size={12} className="text-brand-orange mt-0.5 flex-shrink-0" />
-            <span>{detail}</span>
-          </motion.li>
-        ))}
-      </ul>
-    </Card>
-  )
-}
-
+// ─── App ───────────────────────────────────────────────────
 export default function App() {
   const exportPDF = () => {
     const element = document.getElementById('resume-a4')
     const opt = {
       margin: 2,
-      filename: '个人简历.pdf',
+      filename: '侯伟轩_个人简历.pdf',
       image: { type: 'png', quality: 1 },
       html2canvas: {
         scale: 2,
@@ -180,18 +129,14 @@ export default function App() {
         logging: false,
         windowWidth: 794,
         onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById('resume-a4')
-          if (clonedElement) {
-            clonedElement.style.margin = '0'
-            clonedElement.style.boxShadow = 'none'
+          const el = clonedDoc.getElementById('resume-a4')
+          if (el) {
+            el.style.margin = '0'
+            el.style.boxShadow = 'none'
           }
         }
       },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait'
-      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     }
     html2pdf().set(opt).from(element).save()
@@ -204,10 +149,10 @@ export default function App() {
       useCORS: true,
       letterRendering: true,
       logging: false,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#FDFBF7'
     })
     const link = document.createElement('a')
-    link.download = '个人简历.png'
+    link.download = '侯伟轩_个人简历.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
@@ -215,264 +160,424 @@ export default function App() {
   return (
     <div className="min-h-screen py-8 px-4">
       {/* Export Buttons */}
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
+      <div className="fixed top-5 right-5 z-50 flex gap-2">
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={exportImage}
-          className="px-4 py-2 bg-brand-orange text-white rounded-lg font-medium text-sm shadow-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2"
+          className="export-btn"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
           </svg>
           导出图片
         </motion.button>
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={exportPDF}
-          className="px-4 py-2 bg-brand-orange text-white rounded-lg font-medium text-sm shadow-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2"
+          className="export-btn"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
           </svg>
           导出PDF
         </motion.button>
       </div>
 
-      {/* A4 Container */}
+      {/* A4 Paper */}
       <div id="resume-a4" className="a4-container">
-        {/* A4 Background Decorations */}
-        <div className="a4-bg-decoration a4-bg-decoration--top-right"></div>
-        <div className="a4-bg-decoration a4-bg-decoration--bottom-left"></div>
-        <div className="a4-grid-pattern"></div>
-        <div className="a4-header-decoration"></div>
+        {/* Corner Marks */}
+        <div className="a4-corner-mark a4-corner-mark--tl" />
+        <div className="a4-corner-mark a4-corner-mark--tr" />
+        <div className="a4-corner-mark a4-corner-mark--bl" />
+        <div className="a4-corner-mark a4-corner-mark--br" />
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-6 pb-4 border-b-2 border-gray-100"
+        {/* Background Art */}
+        <div className="a4-bg-art a4-bg-art--circle" />
+        <div className="a4-bg-art a4-bg-art--line1" />
+        <div className="a4-bg-art a4-bg-art--line2" />
+        <div className="a4-bg-art a4-bg-art--dot" />
+
+        {/* ─── Header ─── */}
+        <motion.header
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+          className="mb-5"
         >
-          {/* Avatar */}
-          <div className="mx-auto w-24 h-24 mb-4 rounded-full bg-gradient-to-br from-brand-orange to-brand-orange-dark flex items-center justify-center shadow-lg">
-            <User size={40} className="text-white" />
+          <div className="flex items-start justify-between">
+            {/* Left: Name & Title */}
+            <div className="flex-1">
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={0.1}
+              >
+                {/* Decorative numeral */}
+                <span className="footer-mark block mb-1">No. 001</span>
+                <h1
+                  className="text-[32px] font-bold text-[#2D2318] leading-none tracking-tight mb-1"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                >
+                  {personalInfo.name}
+                </h1>
+                <p
+                  className="text-[15px] text-[#785A3C] tracking-[0.08em] mb-1"
+                  style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 300 }}
+                >
+                  {personalInfo.title}
+                </p>
+                <p
+                  className="text-[12px] text-[#A89A88] tracking-[0.04em]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}
+                >
+                  {personalInfo.salary}
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Right: Geometric Avatar */}
+            <motion.div
+              variants={fadeIn}
+              initial="hidden"
+              animate="visible"
+              custom={0.2}
+              className="avatar-art"
+            >
+              <div className="avatar-art__ring" />
+              <div className="avatar-art__inner">
+                <span className="avatar-art__monogram">
+                  {personalInfo.name.charAt(0)}
+                </span>
+              </div>
+            </motion.div>
           </div>
 
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 font-display tracking-tight">
-            {personalInfo.name}
-          </h1>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <p className="text-xl text-brand-orange font-medium">{personalInfo.title}</p>
-            <span className="text-gray-300">|</span>
-            <p className="text-lg text-gray-600 font-medium">
-              ¥{personalInfo.salary}
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-            <motion.a
-              href={`tel:${personalInfo.phone}`}
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-1.5 hover:text-brand-orange transition-colors"
-            >
-              <Phone size={16} />
-              <span>{personalInfo.phone}</span>
-            </motion.a>
-            <motion.a
-              href={`mailto:${personalInfo.email}`}
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-1.5 hover:text-brand-orange transition-colors"
-            >
-              <Mail size={16} />
-              <span>{personalInfo.email}</span>
-            </motion.a>
-            <span className="flex items-center gap-1.5">
-              <MapPin size={16} />
-              <span>{personalInfo.location}</span>
+          {/* Contact Row */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.3}
+            className="flex flex-wrap gap-x-5 gap-y-2 mt-4 pt-4"
+            style={{ borderTop: '1px solid rgba(120,90,60,0.12)' }}
+          >
+            <a href={`tel:${personalInfo.phone}`} className="contact-link">
+              <Phone size={11} strokeWidth={1.5} />
+              {personalInfo.phone}
+            </a>
+            <a href={`mailto:${personalInfo.email}`} className="contact-link">
+              <Mail size={11} strokeWidth={1.5} />
+              {personalInfo.email}
+            </a>
+            <span className="contact-link">
+              <MapPin size={11} strokeWidth={1.5} />
+              {personalInfo.location}
             </span>
-            <motion.a
-              href={personalInfo.github}
-              target="_blank"
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-1.5 hover:text-brand-orange transition-colors"
-            >
-              <Github size={16} />
-              <span>github.com/wxhou</span>
-            </motion.a>
-          </div>
-        </motion.div>
+            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
+              <Github size={11} strokeWidth={1.5} />
+              github.com/wxhou
+            </a>
+          </motion.div>
+        </motion.header>
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Left Column */}
-          <div className="space-y-4">
-            {/* About Me */}
-            <Card delay={0.1}>
-              <SectionTitle icon={<User size={18} />} title="关于我" delay={0.1} />
+        <div className="section-rule" />
+
+        {/* ─── Two-Column Layout ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* ── Left Column (5 cols) ── */}
+          <div className="md:col-span-5 space-y-5">
+
+            {/* About */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.15}
+            >
+              <div className="section-label">关于我</div>
               <div className="space-y-2">
-                {evaluations.map((evalText, index) => (
+                {evaluations.map((text, i) => (
                   <motion.p
-                    key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    className="text-gray-600 text-sm flex items-start gap-2"
+                    key={i}
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.25 + i * 0.08}
+                    className="text-[12px] text-[#6B5B4D] leading-relaxed"
+                    style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400 }}
                   >
-                    <ChevronRight size={14} className="text-brand-orange mt-1 flex-shrink-0" />
-                    <span>{evalText}</span>
+                    {text}
                   </motion.p>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
             {/* Education */}
-            <Card delay={0.2}>
-              <SectionTitle icon={<GraduationCap size={18} />} title="教育背景" delay={0.2} />
-              <div>
-                <h3 className="font-semibold text-gray-800">{personalInfo.education.school}</h3>
-                <p className="text-gray-600 text-sm">{personalInfo.education.major} · {personalInfo.education.degree}</p>
-              </div>
-            </Card>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.2}
+            >
+              <div className="section-label">教育背景</div>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={0.3}
+                className="mt-1"
+              >
+                <p
+                  className="text-[13px] font-semibold text-[#2D2318]"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  {personalInfo.education.school}
+                </p>
+                <p
+                  className="text-[11px] text-[#8B7B68] mt-0.5"
+                  style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 300 }}
+                >
+                  {personalInfo.education.major} · {personalInfo.education.degree}
+                </p>
+              </motion.div>
+            </motion.div>
 
             {/* Skills - AI */}
-            <Card delay={0.3}>
-              <SectionTitle icon={<Cpu size={18} />} title="AI技能" delay={0.3} />
-              <div className="flex flex-wrap gap-2">
-                {skills.ai.map((skill, index) => (
-                  <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.25}
+            >
+              <div className="section-label">AI技能</div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {skills.ai.map((s, i) => (
+                  <motion.span
+                    key={s}
+                    variants={fadeIn}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.35 + i * 0.04}
+                    className="skill-tag"
+                  >
+                    {s}
+                  </motion.span>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
             {/* Skills - Backend */}
-            <Card delay={0.35}>
-              <SectionTitle icon={<Code size={18} />} title="后端开发" delay={0.35} />
-              <div className="flex flex-wrap gap-2">
-                {skills.backend.map((skill, index) => (
-                  <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.3}
+            >
+              <div className="section-label">后端开发</div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {skills.backend.map((s, i) => (
+                  <motion.span
+                    key={s}
+                    variants={fadeIn}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.4 + i * 0.04}
+                    className="skill-tag"
+                  >
+                    {s}
+                  </motion.span>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
             {/* Skills - Automation */}
-            <Card delay={0.45}>
-              <SectionTitle icon={<Zap size={18} />} title="自动化测试" delay={0.45} />
-              <div className="flex flex-wrap gap-2">
-                {skills.automation.map((skill, index) => (
-                  <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.35}
+            >
+              <div className="section-label">自动化测试</div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {skills.automation.map((s, i) => (
+                  <motion.span
+                    key={s}
+                    variants={fadeIn}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.45 + i * 0.04}
+                    className="skill-tag"
+                  >
+                    {s}
+                  </motion.span>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
             {/* Skills - Basic */}
-            <Card delay={0.5}>
-              <SectionTitle icon={<Package size={18} />} title="基础技能" delay={0.5} />
-              <div className="flex flex-wrap gap-2">
-                {skills.basic.map((skill, index) => (
-                  <SkillTag key={skill} delay={index * 0.05}>{skill}</SkillTag>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.4}
+            >
+              <div className="section-label">基础技能</div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {skills.basic.map((s, i) => (
+                  <motion.span
+                    key={s}
+                    variants={fadeIn}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.5 + i * 0.04}
+                    className="skill-tag"
+                  >
+                    {s}
+                  </motion.span>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
-            {/* Blog */}
-            <Card delay={0.55}>
-              <SectionTitle icon={<BookOpen size={18} />} title="个人主页" delay={0.55} />
-              <div className="space-y-3">
-                <motion.a
-                  href="https://www.cnblogs.com/wxhou"
-                  target="_blank"
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
-                >
-                  <Link size={14} />
-                  <span>博客园</span>
-                </motion.a>
-                <motion.a
-                  href="https://gitee.com/wxhou"
-                  target="_blank"
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
-                >
-                  <Link size={14} />
-                  <span>Gitee</span>
-                </motion.a>
-                <motion.a
-                  href="https://wxhou.github.io/openspec-playwright/"
-                  target="_blank"
-                  whileHover={{ scale: 1.02, x: 5 }}
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand-orange transition-colors"
-                >
-                  <Link size={14} />
-                  <span>OpenSpec Playwright</span>
-                </motion.a>
+            {/* Personal Links */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.45}
+            >
+              <div className="section-label">个人主页</div>
+              <div className="space-y-2 mt-1">
+                {personalLinks.map((link, i) => (
+                  <motion.a
+                    key={link.name}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.55 + i * 0.06}
+                    className="link-item"
+                  >
+                    <ExternalLink size={10} strokeWidth={1.5} />
+                    <span className="link-item__name">{link.name}</span>
+                  </motion.a>
+                ))}
               </div>
-            </Card>
+            </motion.div>
           </div>
 
-          {/* Right Column */}
-          <div className="space-y-4">
+          {/* ── Right Column (7 cols) ── */}
+          <div className="md:col-span-7 space-y-5">
+
             {/* Experience */}
-            <Card delay={0.15}>
-              <SectionTitle icon={<Briefcase size={18} />} title="工作经历" delay={0.15} />
-              <div className="relative pl-4 border-l-2 border-brand-orange/30">
-                {experience[0].roles.map((role, index) => (
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.2}
+            >
+              <div className="section-label">工作经历</div>
+              <div className="mt-1">
+                {experience[0].roles.map((role, i) => (
                   <motion.div
                     key={role.title}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + index * 0.15 }}
-                    className="relative mb-4 last:mb-0"
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.3 + i * 0.12}
+                    className="timeline-item"
                   >
-                    <span className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-brand-orange border-2 border-white"></span>
-                    <h3 className="font-semibold text-gray-800">{role.title}</h3>
-                    <p className="text-sm text-brand-orange-dark font-medium">{experience[0].company}</p>
-                    <p className="text-xs text-gray-500">{role.period}</p>
+                    <div className={`timeline-item__dot ${role.active ? 'timeline-item__dot--active' : ''}`} />
+                    <div className="timeline-item__title">{role.title}</div>
+                    <div className="timeline-item__company">{experience[0].company}</div>
+                    <div className="timeline-item__period">{role.period}</div>
                   </motion.div>
                 ))}
               </div>
-            </Card>
+            </motion.div>
 
             {/* Projects */}
-            <div>
-              <SectionTitle icon={<Rocket size={18} />} title="项目经验" delay={0.2} />
-              <div className="space-y-3">
-                {projects.map((project, index) => (
-                  <ProjectCard key={project.name} project={project} index={index} />
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.3}
+            >
+              <div className="section-label">项目经验</div>
+              <div className="mt-1 space-y-4">
+                {projects.map((project, i) => (
+                  <motion.div
+                    key={project.name}
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    custom={0.4 + i * 0.1}
+                    className="project-card"
+                  >
+                    <div className="project-card__name">{project.name}</div>
+                    <div className="project-card__desc">{project.description}</div>
+                    <div className="space-y-1">
+                      {project.details.map((detail, j) => (
+                        <motion.p
+                          key={j}
+                          variants={fadeIn}
+                          initial="hidden"
+                          animate="visible"
+                          custom={0.5 + i * 0.1 + j * 0.05}
+                          className="project-card__detail"
+                        >
+                          {detail}
+                        </motion.p>
+                      ))}
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
-        {/* Footer */}
+        {/* ─── Footer ─── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-6 pt-4 border-t border-gray-100 text-center"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0.7}
+          className="mt-6 pt-4 flex items-center justify-between"
+          style={{ borderTop: '1px solid rgba(120,90,60,0.12)' }}
         >
-          <div className="flex justify-center gap-4 mb-4">
+          <div className="flex gap-3">
             <motion.a
               href={`tel:${personalInfo.phone}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-2.5 bg-brand-orange text-white rounded-full font-medium text-sm hover:bg-brand-orange-dark transition-colors shadow-md hover:shadow-lg"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="btn-cta btn-cta--primary"
             >
-              Contact Me
+              联系我
             </motion.a>
             <motion.a
               href={`mailto:${personalInfo.email}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-full font-medium text-sm hover:bg-gray-200 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="btn-cta btn-cta--ghost"
             >
-              Send Email
+              发送邮件
             </motion.a>
           </div>
-          <p className="text-xs text-gray-400">
-            © 2026 {personalInfo.name}. Built with care.
-          </p>
+          <span className="footer-mark">
+            © 2026 {personalInfo.name}
+          </span>
         </motion.div>
       </div>
     </div>
