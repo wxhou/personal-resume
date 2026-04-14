@@ -377,7 +377,7 @@ export default function App() {
 
             {/* Blog */}
             <Card delay={0.55}>
-              <SectionTitle icon={<BookOpen size={18} />} title="个人博客" delay={0.55} />
+              <SectionTitle icon={<BookOpen size={18} />} title="个人主页" delay={0.55} />
               <div className="space-y-3">
                 <motion.a
                   href="https://www.cnblogs.com/wxhou"
