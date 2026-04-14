@@ -825,9 +825,9 @@ body {
   flex-direction: column;
   gap: 1px;
   border-radius: 0 6px 6px 0;
-  overflow: hidden;
   box-shadow: 2px 0 16px rgba(0,0,0,0.15);
   transition: var(--page-transition);
+  width: 56px;
 }
 :root[data-theme="dark"] .theme-switcher {
   background: #18181B;
@@ -846,18 +846,22 @@ body {
 }
 .theme-switcher__btn {
   font-family: 'Outfit', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
-  letter-spacing: 0.1em;
-  padding: 12px 5px;
+  letter-spacing: 0.06em;
+  padding: 12px 0;
   border: none;
   cursor: pointer;
   background: transparent;
   color: #71717A;
   transition: all 200ms ease;
-  line-height: 1;
+  line-height: 1.4;
   text-align: center;
-  min-width: 52px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 2px solid transparent;
 }
 .theme-switcher__btn:hover {
   color: #FAFAFA;
