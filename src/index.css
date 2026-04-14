@@ -823,67 +823,71 @@ body {
   z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border-radius: 0 8px 8px 0;
+  gap: 1px;
+  border-radius: 0 6px 6px 0;
   overflow: hidden;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+  box-shadow: 2px 0 16px rgba(0,0,0,0.15);
   transition: var(--page-transition);
 }
 :root[data-theme="dark"] .theme-switcher {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: #18181B;
+  border: 1px solid rgba(255,255,255,0.06);
   border-left: none;
 }
 :root[data-theme="editorial"] .theme-switcher {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: #F5F2ED;
+  border: 1px solid rgba(28,25,23,0.1);
   border-left: none;
 }
 :root[data-theme="geometric"] .theme-switcher {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: #F8FAFC;
+  border: 1px solid rgba(15,23,42,0.08);
   border-left: none;
 }
 .theme-switcher__btn {
-  font-family: var(--font-ui);
-  font-size: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 9px;
   font-weight: 400;
-  letter-spacing: 0.08em;
-  padding: 10px 8px;
+  letter-spacing: 0.1em;
+  padding: 12px 5px;
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--text-muted);
+  color: #71717A;
   transition: all 200ms ease;
   line-height: 1;
   text-align: center;
-  min-width: 48px;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
+  min-width: 52px;
 }
 .theme-switcher__btn:hover {
-  color: var(--text-primary);
-  background: var(--border);
+  color: #FAFAFA;
+  background: rgba(255,255,255,0.06);
+}
+:root[data-theme="editorial"] .theme-switcher__btn:hover {
+  color: #1C1917;
+  background: rgba(28,25,23,0.06);
+}
+:root[data-theme="geometric"] .theme-switcher__btn:hover {
+  color: #0F172A;
+  background: rgba(15,23,42,0.06);
 }
 .theme-switcher__btn--active {
-  color: var(--accent);
   font-weight: 600;
 }
 :root[data-theme="dark"] .theme-switcher__btn--active {
-  background: rgba(245,158,11,0.12);
-  border-left: 2px solid var(--accent);
+  color: #F59E0B;
+  background: rgba(245,158,11,0.08);
+  border-left: 2px solid #F59E0B;
 }
 :root[data-theme="editorial"] .theme-switcher__btn--active {
-  background: rgba(220,38,38,0.08);
-  border-left: 2px solid var(--accent);
+  color: #DC2626;
+  background: rgba(220,38,38,0.06);
+  border-left: 2px solid #DC2626;
 }
 :root[data-theme="geometric"] .theme-switcher__btn--active {
-  background: rgba(30,58,95,0.1);
-  border-left: 2px solid var(--accent);
-}
-:root[data-theme="geometric"] .theme-switcher__btn {
-  letter-spacing: 0.15em;
+  color: #1E3A5F;
+  background: rgba(30,58,95,0.06);
+  border-left: 2px solid #1E3A5F;
 }
 
 /* ─── Export Buttons ─── */
