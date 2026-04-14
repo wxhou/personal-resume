@@ -97,6 +97,7 @@ const personalLinks = [
 ]
 
 const THEMES = [
+  { id: 'original', label: '原始' },
   { id: 'dark', label: '精密' },
   { id: 'editorial', label: '杂志' },
   { id: 'geometric', label: '几何' },
@@ -156,7 +157,7 @@ export default function App() {
       const saved = localStorage.getItem('resume-theme')
       if (saved && THEMES.some(t => t.id === saved)) return saved
     }
-    return 'dark'
+    return 'original'
   })
 
   useEffect(() => {

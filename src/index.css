@@ -103,6 +103,33 @@ body {
   --page-transition: all 300ms ease-out;
 }
 
+:root[data-theme="original"] {
+  --bg-page: #F0EEEB;
+  --bg-primary: #FFFFFF;
+  --bg-surface: #FDFCFB;
+  --bg-elevated: #F5F5F5;
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #888888;
+  --accent: #FF6B35;
+  --accent-hover: #E55A2B;
+  --accent-subtle: rgba(255, 107, 53, 0.1);
+  --border: rgba(0, 0, 0, 0.06);
+  --border-hover: rgba(0, 0, 0, 0.12);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-ui: 'Outfit', sans-serif;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 30px rgba(255, 107, 53, 0.15);
+  --radius-avatar: 9999px;
+  --radius-tag: 9999px;
+  --avatar-shape: circle;
+  --timeline-marker: circle;
+  --page-transition: all 300ms ease-out;
+}
+
 /* ─── A4 Paper ─── */
 .a4-container {
   width: 210mm;
@@ -163,6 +190,76 @@ body {
 /* Geometric: corner marks */
 :root[data-theme="geometric"] .a4-corner-mark {
   border-color: rgba(15, 23, 42, 0.15);
+}
+
+/* Original: sidebar */
+:root[data-theme="original"] .theme-switcher {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-left: none;
+}
+:root[data-theme="original"] .theme-switcher__btn:hover {
+  color: #1A1A1A;
+  background: rgba(255, 107, 53, 0.06);
+}
+:root[data-theme="original"] .theme-switcher__btn--active {
+  color: #FF6B35;
+  background: rgba(255, 107, 53, 0.08);
+  border-left: 2px solid #FF6B35;
+}
+
+/* Original: export button */
+:root[data-theme="original"] .export-btn {
+  background: rgba(255,255,255,0.95);
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* Original: warm gradient + grid pattern */
+:root[data-theme="original"] body {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+:root[data-theme="original"] .a4-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 107, 53, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 107, 53, 0.02) 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Original: top-right corner decoration */
+:root[data-theme="original"] .a4-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, transparent 50%, rgba(255, 107, 53, 0.08) 50%);
+  pointer-events: none;
+}
+/* Original: header decoration line */
+:root[data-theme="original"] .a4-header-decoration {
+  position: absolute;
+  top: 12mm;
+  left: 15mm;
+  right: 15mm;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 107, 53, 0.3) 20%, rgba(255, 107, 53, 0.6) 50%, rgba(255, 107, 53, 0.3) 80%, transparent 100%);
+  pointer-events: none;
+}
+:root[data-theme="original"] .a4-corner-mark {
+  border-color: rgba(255, 107, 53, 0.15);
+}
+:root[data-theme="original"] .a4-corner-mark--tl {
+  background: linear-gradient(135deg, transparent 50%, rgba(255, 107, 53, 0.06) 50%);
+  border: none;
+}
+:root[data-theme="original"] .a4-corner-mark--bl {
+  background: linear-gradient(-45deg, transparent 50%, rgba(255, 107, 53, 0.05) 50%);
+  border: none;
 }
 
 /* ─── Corner Marks ─── */
@@ -252,8 +349,22 @@ body {
   border-radius: 9999px;
 }
 :root[data-theme="geometric"] .avatar-wrap {
-  /* hexagonal clip handled via CSS */
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+:root[data-theme="original"] .avatar-wrap {
+  border-radius: 9999px;
+}
+:root[data-theme="original"] .avatar-inner {
+  background: linear-gradient(145deg, #FF8F66, #FF6B35);
+  border-radius: 9999px;
+}
+:root[data-theme="original"] .avatar-ring {
+  border-color: rgba(255, 107, 53, 0.3);
+  border-radius: 9999px;
+}
+:root[data-theme="original"] .avatar-monogram {
+  color: #fff;
+  font-size: 20px;
 }
 .avatar-ring {
   position: absolute;
@@ -372,6 +483,21 @@ body {
   color: white;
   border-color: var(--accent);
 }
+/* Original: skill tag - gradient orange pills */
+:root[data-theme="original"] .skill-tag {
+  background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,143,102,0.08));
+  border-color: rgba(255, 107, 53, 0.2);
+  color: #CC4400;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 3px 10px;
+}
+:root[data-theme="original"] .skill-tag:hover {
+  background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,143,102,0.15));
+  border-color: rgba(255, 107, 53, 0.4);
+}
 
 /* ─── Project Card ─── */
 .project-card {
@@ -414,6 +540,56 @@ body {
 :root[data-theme="geometric"] .project-card:hover::before {
   opacity: 1;
   height: 70%;
+}
+/* Original: project card with shadow and hover dot */
+:root[data-theme="original"] .project-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 5mm;
+  margin-bottom: 3mm;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+:root[data-theme="original"] .project-card:hover {
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.12);
+}
+:root[data-theme="original"] .project-card:hover::before {
+  display: none;
+}
+:root[data-theme="original"] .project-card::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+:root[data-theme="original"] .project-card:hover::after {
+  opacity: 1;
+}
+:root[data-theme="original"] .project-card__name {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+:root[data-theme="original"] .project-card__desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: #6B6B6B;
+}
+:root[data-theme="original"] .project-card__detail {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: #888;
+}
+:root[data-theme="original"] .project-card__detail::before {
+  color: #FF6B35;
 }
 .project-card__name {
   font-family: var(--font-display);
@@ -587,6 +763,34 @@ body {
   font-family: var(--font-body);
   font-size: 10px;
 }
+:root[data-theme="original"] .timeline-item::before {
+  background: rgba(0,0,0,0.06);
+}
+:root[data-theme="original"] .timeline-dot {
+  border-color: #ccc;
+  background: #fff;
+}
+:root[data-theme="original"] .timeline-dot--active {
+  background: #FF6B35;
+  border-color: #FF6B35;
+  box-shadow: 0 0 6px rgba(255, 107, 53, 0.4);
+}
+:root[data-theme="original"] .timeline-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+:root[data-theme="original"] .timeline-company {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: #888;
+}
+:root[data-theme="original"] .timeline-period {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #aaa;
+}
 .timeline-period {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -614,6 +818,14 @@ body {
 }
 .link-item__name {
   font-weight: 400;
+}
+:root[data-theme="original"] .link-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: #4A4A4A;
+}
+:root[data-theme="original"] .link-item:hover {
+  color: #FF6B35;
 }
 
 /* ─── Section Rule ─── */
@@ -646,6 +858,18 @@ body {
   font-family: var(--font-body);
   font-size: 11px;
 }
+:root[data-theme="original"] .section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #FF6B35;
+  letter-spacing: 0.1em;
+}
+:root[data-theme="original"] .about-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #4A4A4A;
+}
 
 /* ─── Education ─── */
 .edu-school {
@@ -668,6 +892,17 @@ body {
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
+}
+:root[data-theme="original"] .edu-school {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+:root[data-theme="original"] .edu-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: #888;
 }
 .edu-meta {
   font-family: var(--font-ui);
@@ -746,6 +981,24 @@ body {
   font-size: 10px;
   letter-spacing: 0.08em;
 }
+:root[data-theme="original"] .header-name {
+  font-size: 30px;
+  color: #1A1A1A;
+  letter-spacing: -0.01em;
+}
+:root[data-theme="original"] .header-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #FF6B35;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+:root[data-theme="original"] .header-salary {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #888;
+}
 
 /* ─── CTA Buttons ─── */
 .btn-cta {
@@ -786,6 +1039,22 @@ body {
   color: #fff;
   border-radius: 0;
 }
+:root[data-theme="original"] .btn-cta--primary {
+  background: linear-gradient(135deg, #FF8F66, #FF6B35);
+  color: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+}
+:root[data-theme="original"] .btn-cta--primary:hover {
+  background: linear-gradient(135deg, #FF6B35, #E55A2B);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.35);
+}
+:root[data-theme="original"] .btn-cta--ghost {
+  background: transparent;
+  color: #4A4A4A;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 9999px;
+}
 .btn-cta--ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -812,6 +1081,9 @@ body {
 }
 :root[data-theme="geometric"] .footer-mark {
   color: var(--text-muted);
+}
+:root[data-theme="original"] .footer-mark {
+  color: #aaa;
 }
 
 /* ─── Theme Switcher (Left Sidebar) ─── */
