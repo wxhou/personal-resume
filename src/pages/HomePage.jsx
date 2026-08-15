@@ -12,6 +12,8 @@ import { personalInfo, skills, personalLinks } from '../data/resume.js'
 import featuredData from '../data/featuredProjects.json'
 import { achievements } from '../data/achievements.js'
 import { facts, heroStatement } from '../data/facts.js'
+import HeroParticles from '../components/HeroParticles.jsx'
+import ScrollProgress from '../components/ScrollProgress.jsx'
 import './home.css'
 
 // blog.json 为构建时生成（.gitignore），用 glob 容错加载
@@ -68,8 +70,14 @@ export default function HomePage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
+      {/* ─── 滚动进度条 ─── */}
+      <ScrollProgress />
+
       {/* ─── Hero ─── */}
       <motion.section className="home-hero" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
+        <div className="home-hero__bg" aria-hidden="true">
+          <HeroParticles />
+        </div>
         <span className="home-hero__eyebrow">AI APPLICATION ENGINEER · AI 编程落地</span>
         <h1 className="home-hero__name">{heroStatement.headline}</h1>
         <p className="home-hero__subtitle">{heroStatement.subtitle}</p>
