@@ -1,5 +1,12 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Head } from 'vite-react-ssg'
+import '@fontsource/noto-serif-sc/400.css'
+import '@fontsource/noto-serif-sc/600.css'
+import '@fontsource/noto-serif-sc/700.css'
+import '@fontsource/noto-sans-sc/400.css'
+import '@fontsource/noto-sans-sc/500.css'
+import '@fontsource/noto-sans-sc/700.css'
 import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, FileText, FolderGit2, Cpu } from 'lucide-react'
 import { personalInfo, skills, personalLinks } from '../data/resume.js'
 import featuredData from '../data/featuredProjects.json'
@@ -42,6 +49,12 @@ function SectionHeader({ index, label, title, note }) {
 }
 
 export default function HomePage() {
+  // index.css 的简历主题变量会把 body 染成暗色；首页强制暖米色
+  useEffect(() => {
+    document.body.style.background = '#FBF7F1'
+    return () => { document.body.style.background = '' }
+  }, [])
+
   return (
     <div className="home-page">
       <Head>

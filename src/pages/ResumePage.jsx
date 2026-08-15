@@ -134,7 +134,7 @@ export default function ResumePage() {
       <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
 
       {/* Export Buttons - Top Right (below site nav) */}
-      <div className="fixed top-16 right-4 z-50 flex gap-2">
+      <div className="fixed top-20 right-4 z-50 flex gap-2">
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
