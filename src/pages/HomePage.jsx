@@ -1,13 +1,17 @@
 import { motion } from 'framer-motion'
 import { Head } from 'vite-react-ssg'
-import { ArrowRight, ExternalLink, Github, Mail, Rss } from 'lucide-react'
+import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, FileText, FolderGit2, Cpu } from 'lucide-react'
 import { personalInfo, skills, personalLinks } from '../data/resume.js'
-import featuredProjects from '../data/featuredProjects.json'
+import featuredData from '../data/featuredProjects.json'
+import { achievements } from '../data/achievements.js'
+import { facts, heroStatement } from '../data/facts.js'
 import './home.css'
 
 // blog.json 为构建时生成（.gitignore），用 glob 容错加载
 const dataFiles = import.meta.glob('../data/blog.json', { eager: true })
 const blogPosts = dataFiles['../data/blog.json']?.default ?? []
+
+const { featured, more } = featuredData
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -18,16 +22,23 @@ const fadeUp = {
   })
 }
 
-const skillGroups = [
-  { label: 'AI 技能', key: 'ai' },
-  { label: '后端开发', key: 'backend' },
-  { label: '自动化测试', key: 'automation' },
-]
-
 function formatDate(iso) {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function SectionHeader({ index, label, title, note }) {
+  return (
+    <div className="home-section__head">
+      <div>
+        <span className="home-section__eyebrow">{label} / {index}</span>
+        <h2 className="home-section__title">{title}</h2>
+      </div>
+      <span className="home-section__index" aria-hidden="true">{index}</span>
+      {note && <p className="home-section__note">{note}</p>}
+    </div>
+  )
 }
 
 export default function HomePage() {
@@ -43,36 +54,43 @@ export default function HomePage() {
         <meta property="og:url" content="https://wxhou.vercel.app/" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
+
       {/* ─── Hero ─── */}
-      <motion.section
-        className="home-hero"
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={0}
-      >
-        <h1 className="home-hero__name">{personalInfo.name}</h1>
-        <p className="home-hero__title">{personalInfo.title} · {personalInfo.location}</p>
-        <p className="home-hero__tagline">
-          专注 AI 应用开发：LangChain、RAG、Dify、AI Agent、MCP。
-          用 AI 编程解决真实业务问题，也折腾开源工具与自动化。
-        </p>
-        <a href="/resume" className="home-hero__cta">
-          查看简历
-          <ArrowRight size={16} />
-        </a>
+      <motion.section className="home-hero" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
+        <span className="home-hero__eyebrow">AI APPLICATION ENGINEER · AI 编程落地</span>
+        <h1 className="home-hero__name">{heroStatement.headline}</h1>
+        <p className="home-hero__subtitle">{heroStatement.subtitle}</p>
+        <p className="home-hero__tagline">{heroStatement.tagline}</p>
+        <p className="home-hero__status">{heroStatement.status}</p>
+        <div className="home-hero__ctas">
+          <a href="#projects" className="home-hero__cta">
+            查看项目
+            <ArrowDown size={16} />
+          </a>
+          <a href="/resume" className="home-hero__cta home-hero__cta--ghost">
+            查看简历
+            <ArrowRight size={16} />
+          </a>
+        </div>
       </motion.section>
 
-      {/* ─── Skills ─── */}
-      <motion.section
-        className="home-section"
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={0.1}
-      >
-        <div className="home-section__label">技能栈</div>
-        {skillGroups.map(group => (
+      {/* ─── 成就滚动条 ─── */}
+      <div className="home-marquee" aria-label="成就速览">
+        <div className="home-marquee__track">
+          {[...achievements, ...achievements].map((text, i) => (
+            <span key={i} className="home-marquee__item">●{text}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── 技能栈 ─── */}
+      <motion.section className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.05}>
+        <SectionHeader index="00" label="SKILLS" title="技能栈" />
+        {[
+          { label: 'AI 技能', key: 'ai' },
+          { label: '后端开发', key: 'backend' },
+          { label: '自动化测试', key: 'automation' },
+        ].map(group => (
           <div key={group.key} style={{ marginBottom: 12 }}>
             <div style={{ fontSize: '0.8rem', color: '#A8A29E', marginBottom: 8 }}>{group.label}</div>
             <div className="home-skills">
@@ -84,17 +102,11 @@ export default function HomePage() {
         ))}
       </motion.section>
 
-      {/* ─── Featured Projects ─── */}
-      <motion.section
-        className="home-section"
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={0.2}
-      >
-        <div className="home-section__label">精选项目</div>
+      {/* ─── 精选项目 ─── */}
+      <motion.section id="projects" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.1}>
+        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="6 个精选开源项目：测试代理、AI 工具与实验作品。" />
         <div className="home-projects">
-          {featuredProjects.map(project => (
+          {featured.map((project, i) => (
             <a
               key={project.name}
               href={project.url}
@@ -102,11 +114,17 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="home-project"
             >
-              <div className="home-project__name">
-                {project.name}
-                <span className="home-project__lang">{project.language}</span>
+              <div className="home-project__head">
+                <span className="home-project__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span className="home-project__tag">{project.tag}</span>
               </div>
+              <div className="home-project__name">{project.name}</div>
               <div className="home-project__desc">{project.description}</div>
+              <div className="home-project__tech">
+                {project.tech.map(t => (
+                  <span key={t} className="home-project__chip">{t}</span>
+                ))}
+              </div>
               <span className="home-project__link">
                 GitHub
                 <ExternalLink size={12} />
@@ -114,18 +132,72 @@ export default function HomePage() {
             </a>
           ))}
         </div>
+
+        {/* ─── 补充项目 ─── */}
+        <div className="home-more">
+          <div className="home-more__label">MORE WORK · 还折腾过这些</div>
+          <div className="home-more__grid">
+            {more.map(project => (
+              <a
+                key={project.name}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="home-more__item"
+              >
+                <span className="home-more__name">{project.name}</span>
+                <span className="home-more__desc">{project.description}</span>
+              </a>
+            ))}
+          </div>
+        </div>
       </motion.section>
 
-      {/* ─── Latest Blog ─── */}
+      {/* ─── 成果 ─── */}
+      <motion.section id="proof" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.15}>
+        <SectionHeader index="02" label="PROOF" title="看得见的成果" note="真实可核验的数据与记录。" />
+        <div className="home-proof">
+          <a className="home-proof__card" href={personalInfo.github} target="_blank" rel="noopener noreferrer">
+            <FolderGit2 size={22} className="home-proof__icon" />
+            <span className="home-proof__value">27+</span>
+            <span className="home-proof__label">GitHub 公开仓库</span>
+          </a>
+          <a className="home-proof__card" href="https://github.com/wxhou/openspec-playwright" target="_blank" rel="noopener noreferrer">
+            <Star size={22} className="home-proof__icon" />
+            <span className="home-proof__value">⭐8</span>
+            <span className="home-proof__label">openspec-playwright 开源 star</span>
+          </a>
+          <a className="home-proof__card" href="https://www.cnblogs.com/wxhou" target="_blank" rel="noopener noreferrer">
+            <FileText size={22} className="home-proof__icon" />
+            <span className="home-proof__value">20 篇</span>
+            <span className="home-proof__label">博客园技术文章</span>
+          </a>
+          <a className="home-proof__card" href="/resume">
+            <Cpu size={22} className="home-proof__icon" />
+            <span className="home-proof__value">4 个</span>
+            <span className="home-proof__label">ToB 项目业务落地</span>
+          </a>
+        </div>
+      </motion.section>
+
+      {/* ─── About 三事实 ─── */}
+      <motion.section id="about" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.2}>
+        <SectionHeader index="03" label="ABOUT" title="三个事实" note="8 年成长弧线：测试 → 项目 → AI 应用。" />
+        <div className="home-facts">
+          {facts.map(fact => (
+            <div key={fact.id} className="home-fact">
+              <span className="home-fact__id">{fact.id}</span>
+              <h3 className="home-fact__title">{fact.title}</h3>
+              <p className="home-fact__desc">{fact.description}</p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ─── 最新博客 ─── */}
       {blogPosts.length > 0 && (
-        <motion.section
-          className="home-section"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.3}
-        >
-          <div className="home-section__label">最新博客</div>
+        <motion.section id="blog" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.25}>
+          <SectionHeader index="04" label="WRITING" title="最新博客" note="博客园持续输出的技术文章。" />
           <div className="home-blog">
             {blogPosts.slice(0, 5).map(post => (
               <a
@@ -143,37 +215,38 @@ export default function HomePage() {
         </motion.section>
       )}
 
-      {/* ─── Find Me ─── */}
-      <motion.section
-        className="home-section"
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={0.4}
-      >
-        <div className="home-section__label">找到我</div>
+      {/* ─── 联系 ─── */}
+      <motion.section id="contact" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.3}>
+        <SectionHeader index="05" label="CONTACT" title="想聊点什么？" note="求职沟通 · 技术交流 · 项目合作，欢迎联系。" />
         <div className="home-contact">
-          <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-contact__link">
-            <Github size={15} />
-            GitHub
-          </a>
-          {personalLinks.map(link => (
-            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="home-contact__link">
-              {link.name === '博客园' ? <Rss size={15} /> : <ExternalLink size={15} />}
-              {link.name}
+          <div className="home-contact__qr">
+            {/* TODO(user): 用户提供微信二维码图片后替换为 public/wechat-qr.png */}
+            <div className="home-contact__qr-placeholder" aria-label="微信二维码占位">二维码<br />待提供</div>
+            <span className="home-contact__qr-label">微信</span>
+          </div>
+          <div className="home-contact__links">
+            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-contact__link">
+              <Github size={15} />
+              GitHub
             </a>
-          ))}
-          <a href={`mailto:${personalInfo.email}`} className="home-contact__link">
-            <Mail size={15} />
-            邮箱
-          </a>
+            {personalLinks.map(link => (
+              <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="home-contact__link">
+                {link.name === '博客园' ? <Rss size={15} /> : <ExternalLink size={15} />}
+                {link.name}
+              </a>
+            ))}
+            <a href={`mailto:${personalInfo.email}`} className="home-contact__link">
+              <Mail size={15} />
+              邮箱
+            </a>
+          </div>
         </div>
       </motion.section>
 
       {/* ─── Footer ─── */}
       <footer className="home-footer">
-        <span>© 2026 {personalInfo.name}</span>
-        <span>Powered by React + Vite</span>
+        <span>{heroStatement.headline} · {personalInfo.name}</span>
+        <span>© 2026 {personalInfo.name} · BUILT WITH AI, SHIPPED BY HUMAN</span>
       </footer>
     </div>
   )

@@ -1,38 +1,84 @@
-[
-  {
-    "name": "openspec-playwright",
-    "description": "OpenSpec + Playwright 测试代理集成，让 AI 自动生成并执行端到端测试",
-    "language": "TypeScript",
-    "url": "https://github.com/wxhou/openspec-playwright"
-  },
-  {
-    "name": "gpt-image2-prompt",
-    "description": "GPT Image to Prompt：从图片反推提示词的工具",
-    "language": "TypeScript",
-    "url": "https://github.com/wxhou/gpt-image2-prompt"
-  },
-  {
-    "name": "image2treeModel",
-    "description": "Object Sculptor：参考图生成程序化 Three.js 雕塑模型",
-    "language": "Python",
-    "url": "https://github.com/wxhou/image2treeModel"
-  },
-  {
-    "name": "open-kimi-ppt-skill",
-    "description": "非官方 Kimi Slides Skill：让 AI Agent 生成可编辑 PPT 并附带本地浏览器编辑",
-    "language": "Python",
-    "url": "https://github.com/wxhou/open-kimi-ppt-skill"
-  },
-  {
-    "name": "free-llm-api-list",
-    "description": "免费 LLM API 精选列表，收录有验证免费额度的服务",
-    "language": "Markdown",
-    "url": "https://github.com/wxhou/free-llm-api-list"
-  },
-  {
-    "name": "blog-builder",
-    "description": "AI 驱动的技术文章写作平台",
-    "language": "TypeScript",
-    "url": "https://github.com/wxhou/blog-builder"
-  }
-]
+{
+  "featured": [
+    {
+      "name": "openspec-playwright",
+      "description": "OpenSpec + Playwright 测试代理集成，让 AI 自动生成并执行端到端测试",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/openspec-playwright",
+      "tag": "开源工具",
+      "tech": ["TypeScript", "OpenSpec", "Playwright"]
+    },
+    {
+      "name": "gpt-image2-prompt",
+      "description": "GPT Image to Prompt：从图片反推提示词的工具",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/gpt-image2-prompt",
+      "tag": "AI 工具",
+      "tech": ["TypeScript", "GPT"]
+    },
+    {
+      "name": "image2treeModel",
+      "description": "Object Sculptor：参考图生成程序化 Three.js 雕塑模型",
+      "language": "Python",
+      "url": "https://github.com/wxhou/image2treeModel",
+      "tag": "实验项目",
+      "tech": ["Python", "Three.js"]
+    },
+    {
+      "name": "open-kimi-ppt-skill",
+      "description": "非官方 Kimi Slides Skill：让 AI Agent 生成可编辑 PPT 并附带本地浏览器编辑",
+      "language": "Python",
+      "url": "https://github.com/wxhou/open-kimi-ppt-skill",
+      "tag": "AI 工具",
+      "tech": ["Python", "Kimi", "Agent"]
+    },
+    {
+      "name": "free-llm-api-list",
+      "description": "免费 LLM API 精选列表，收录有验证免费额度的服务",
+      "language": "Markdown",
+      "url": "https://github.com/wxhou/free-llm-api-list",
+      "tag": "资源清单",
+      "tech": ["LLM", "API"]
+    },
+    {
+      "name": "blog-builder",
+      "description": "AI 驱动的技术文章写作平台",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/blog-builder",
+      "tag": "AI 应用",
+      "tech": ["TypeScript", "AI"]
+    }
+  ],
+  "more": [
+    {
+      "name": "miniprogram-test",
+      "description": "微信小程序自动化测试框架（Python + pytest + uiautomator2）",
+      "url": "https://github.com/wxhou/miniprogram-test"
+    },
+    {
+      "name": "steward",
+      "description": "智学网 APP 自动化测试",
+      "url": "https://github.com/wxhou/steward"
+    },
+    {
+      "name": "cloud-dicom-downloader",
+      "description": "云影像下载器，从在线报告下载 CT、MR 片子的 DICOM 文件",
+      "url": "https://github.com/wxhou/cloud-dicom-downloader"
+    },
+    {
+      "name": "knowledge-site",
+      "description": "AI 知识课堂",
+      "url": "https://github.com/wxhou/knowledge-site"
+    },
+    {
+      "name": "obsidian-note",
+      "description": "个人笔记",
+      "url": "https://github.com/wxhou/obsidian-note"
+    },
+    {
+      "name": "deepthink",
+      "description": "Python 深度思考实验",
+      "url": "https://github.com/wxhou/deepthink"
+    }
+  ]
+}

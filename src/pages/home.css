@@ -1,4 +1,4 @@
-/* ─── Home Page 独立视觉（不复用简历主题 class） ─── */
+/* ─── Home Page 独立视觉（照搬 jingjinglearns.cc 叙事结构） ─── */
 
 .home-page {
   min-height: 100vh;
@@ -6,6 +6,7 @@
   background: #FAFAF9;
   color: #1C1917;
   font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  scroll-behavior: smooth;
 }
 
 .home-page a {
@@ -15,44 +16,77 @@
 
 /* ─── Hero ─── */
 .home-hero {
-  padding: 96px 24px 64px;
+  padding: 88px 24px 48px;
   text-align: center;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
-.home-hero__name {
-  font-size: clamp(2.5rem, 6vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 0 8px;
+.home-hero__eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #A8A29E;
+  margin-bottom: 20px;
 }
 
-.home-hero__title {
-  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+.home-hero__name {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px;
+}
+
+.home-hero__subtitle {
+  font-size: clamp(1.05rem, 2.5vw, 1.25rem);
   font-weight: 500;
   color: #57534E;
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 }
 
 .home-hero__tagline {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.7;
   color: #78716C;
-  margin: 0 0 32px;
+  margin: 0 0 18px;
+}
+
+.home-hero__status {
+  display: inline-block;
+  font-size: 0.82rem;
+  color: #44403C;
+  border: 1px solid #E7E5E4;
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin: 0 0 28px;
+  background: #FFFFFF;
+}
+
+.home-hero__ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .home-hero__cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 12px 26px;
   border-radius: 999px;
   background: #1C1917;
   color: #FAFAF9;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 500;
   transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.home-hero__cta--ghost {
+  background: transparent;
+  color: #1C1917;
+  border: 1px solid #D6D3D1;
 }
 
 .home-hero__cta:hover {
@@ -60,20 +94,82 @@
   opacity: 0.9;
 }
 
+/* ─── 成就滚动条（marquee，纯 CSS） ─── */
+.home-marquee {
+  overflow: hidden;
+  border-top: 1px solid #E7E5E4;
+  border-bottom: 1px solid #E7E5E4;
+  background: #FFFFFF;
+  padding: 12px 0;
+}
+
+.home-marquee__track {
+  display: flex;
+  gap: 40px;
+  width: max-content;
+  animation: home-marquee-scroll 36s linear infinite;
+}
+
+.home-marquee__item {
+  font-size: 0.82rem;
+  color: #57534E;
+  white-space: nowrap;
+}
+
+@keyframes home-marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-marquee__track { animation: none; }
+}
+
 /* ─── Section ─── */
 .home-section {
   max-width: 960px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 56px 24px 40px;
+  scroll-margin-top: 48px; /* 锚点跳转避开固定导航 */
 }
 
-.home-section__label {
-  font-size: 0.8rem;
+.home-section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.home-section__eyebrow {
+  display: block;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #A8A29E;
-  margin-bottom: 20px;
+  margin-bottom: 6px;
+}
+
+.home-section__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.home-section__index {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #E7E5E4;
+  line-height: 1;
+}
+
+.home-section__note {
+  flex-basis: 100%;
+  font-size: 0.88rem;
+  color: #78716C;
+  margin: 4px 0 0;
 }
 
 /* ─── Skills ─── */
@@ -92,7 +188,7 @@
   color: #44403C;
 }
 
-/* ─── Projects ─── */
+/* ─── Featured Projects ─── */
 .home-projects {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -116,22 +212,30 @@
   box-shadow: 0 8px 24px rgba(28, 25, 23, 0.06);
 }
 
-.home-project__name {
-  font-size: 1rem;
-  font-weight: 600;
+.home-project__head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
 }
 
-.home-project__lang {
+.home-project__num {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #D6D3D1;
+}
+
+.home-project__tag {
   font-size: 0.7rem;
   font-weight: 500;
   color: #78716C;
   border: 1px solid #E7E5E4;
   border-radius: 999px;
-  padding: 2px 8px;
-  white-space: nowrap;
+  padding: 2px 10px;
+}
+
+.home-project__name {
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .home-project__desc {
@@ -139,6 +243,20 @@
   line-height: 1.6;
   color: #78716C;
   flex: 1;
+}
+
+.home-project__tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.home-project__chip {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #F5F5F4;
+  color: #57534E;
 }
 
 .home-project__link {
@@ -152,6 +270,130 @@
 
 .home-project__link:hover {
   text-decoration: underline;
+}
+
+/* ─── More Projects ─── */
+.home-more {
+  margin-top: 32px;
+}
+
+.home-more__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #A8A29E;
+  margin-bottom: 14px;
+}
+
+.home-more__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.home-more__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #E7E5E4;
+  background: #FFFFFF;
+  transition: border-color 150ms ease;
+}
+
+.home-more__item:hover {
+  border-color: #D6D3D1;
+}
+
+.home-more__name {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.home-more__name:hover {
+  text-decoration: underline;
+}
+
+.home-more__desc {
+  font-size: 0.78rem;
+  color: #A8A29E;
+  line-height: 1.5;
+}
+
+/* ─── Proof ─── */
+.home-proof {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.home-proof__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #E7E5E4;
+  background: #FFFFFF;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.home-proof__card:hover {
+  border-color: #D6D3D1;
+  transform: translateY(-2px);
+}
+
+.home-proof__icon {
+  color: #A8A29E;
+  margin-bottom: 6px;
+}
+
+.home-proof__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.home-proof__label {
+  font-size: 0.8rem;
+  color: #78716C;
+}
+
+/* ─── Facts ─── */
+.home-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.home-fact {
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #E7E5E4;
+  background: #FFFFFF;
+}
+
+.home-fact__id {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #A8A29E;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.home-fact__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.home-fact__desc {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: #78716C;
+  margin: 0;
 }
 
 /* ─── Blog ─── */
@@ -194,6 +436,40 @@
 /* ─── Contact ─── */
 .home-contact {
   display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.home-contact__qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-contact__qr-placeholder {
+  width: 128px;
+  height: 128px;
+  border: 1.5px dashed #D6D3D1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #A8A29E;
+  line-height: 1.6;
+  background: #FFFFFF;
+}
+
+.home-contact__qr-label {
+  font-size: 0.78rem;
+  color: #78716C;
+}
+
+.home-contact__links {
+  display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -225,17 +501,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
   color: #A8A29E;
 }
 
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
   .home-hero {
-    padding: 64px 20px 40px;
+    padding: 56px 20px 36px;
   }
   .home-section {
-    padding: 36px 20px;
+    padding: 40px 20px 32px;
   }
   .home-post {
     flex-direction: column;
@@ -243,5 +521,8 @@
   }
   .home-post__date {
     min-width: 0;
+  }
+  .home-section__index {
+    display: none;
   }
 }
