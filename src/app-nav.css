@@ -1,0 +1,48 @@
+/* ─── 站点导航（全站共享，独立于简历主题） ─── */
+
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(28, 25, 23, 0.92);
+  backdrop-filter: blur(8px);
+  color: #FAFAF9;
+}
+
+.site-nav__brand {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #FAFAF9;
+}
+
+.site-nav__links {
+  display: flex;
+  gap: 4px;
+}
+
+.site-nav__link {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #D6D3D1;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.site-nav__link:hover {
+  color: #FAFAF9;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.site-nav__link--active {
+  color: #FAFAF9;
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: 500;
+}

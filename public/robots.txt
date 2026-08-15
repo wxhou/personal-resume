@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wxhou.vercel.app/sitemap.xml
