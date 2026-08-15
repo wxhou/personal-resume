@@ -23,29 +23,73 @@
   text-align: center;
   max-width: 880px;
   margin: 0 auto;
-  /* 双层径向光晕（参考站实测）：右上粉 + 左下绿 */
+  overflow: hidden;
+  /* 底层静态光晕（保留）：右上粉 + 左下绿 */
   background:
     radial-gradient(120% 90% at 78% 12%, rgba(231, 198, 187, 0.45), rgba(0, 0, 0, 0) 55%),
     radial-gradient(90% 80% at 8% 90%, rgba(126, 148, 121, 0.16), rgba(0, 0, 0, 0) 60%);
 }
 
-/* 粒子画布层：铺满 hero，置于内容之下 */
-.home-hero__bg {
+/* Linear 式慢呼吸光斑：三个大模糊色块极慢漂移变形（40-60s/循环），
+   微妙到「感觉页面活着」但不干扰阅读 */
+.home-hero__glow {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
   pointer-events: none;
 }
 
-.hero-particles {
-  display: block;
-  width: 100%;
-  height: 100%;
+.home-hero__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  will-change: transform;
 }
 
-/* Hero 内容提升到粒子之上 */
-.home-hero > *:not(.home-hero__bg) {
+.home-hero__blob--a {
+  width: 340px; height: 340px;
+  top: -12%; left: 8%;
+  background: rgba(194, 112, 91, 0.20);   /* 赤陶 */
+  animation: blob-drift-a 46s ease-in-out infinite;
+}
+
+.home-hero__blob--b {
+  width: 300px; height: 300px;
+  bottom: -18%; right: 4%;
+  background: rgba(201, 162, 75, 0.16);   /* 金 */
+  animation: blob-drift-b 54s ease-in-out infinite;
+}
+
+.home-hero__blob--c {
+  width: 260px; height: 260px;
+  top: 30%; right: 30%;
+  background: rgba(126, 148, 121, 0.13);  /* 灰绿 */
+  animation: blob-drift-c 40s ease-in-out infinite;
+}
+
+@keyframes blob-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(46px, 30px) scale(1.12); }
+  66%      { transform: translate(-28px, 44px) scale(0.94); }
+}
+
+@keyframes blob-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(-52px, -26px) scale(1.08); }
+  75%      { transform: translate(24px, -40px) scale(0.92); }
+}
+
+@keyframes blob-drift-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(36px, -34px) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__blob { animation: none; }
+}
+
+/* Hero 内容提升到光斑之上 */
+.home-hero > *:not(.home-hero__glow) {
   position: relative;
   z-index: 1;
 }

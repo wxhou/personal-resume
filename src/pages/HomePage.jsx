@@ -12,7 +12,6 @@ import { personalInfo, skills, personalLinks } from '../data/resume.js'
 import featuredData from '../data/featuredProjects.json'
 import { achievements } from '../data/achievements.js'
 import { facts, heroStatement } from '../data/facts.js'
-import HeroParticles from '../components/HeroParticles.jsx'
 import ScrollProgress from '../components/ScrollProgress.jsx'
 import './home.css'
 
@@ -37,16 +36,62 @@ function formatDate(iso) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+// 字符级入场：标题按字符错峰淡入上浮（Codrops 2025 手法，一次性，不循环）
+function SplitChars({ text, className, delay = 0, stagger = 0.045 }) {
+  return (
+    <span className={className} aria-label={text} role="text">
+      {text.split('').map((ch, i) => (
+        <motion.span
+          key={i}
+          aria-hidden="true"
+          className="split-char"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: delay + i * stagger, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: 'inline-block', whiteSpace: 'pre' }}
+        >
+          {ch}
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
+// 区块标题：滚动进场时字符错峰（InView 一次性触发）
+// 区块标题：滚动进场时字符错峰（InView 一次性触发）
+function SectionTitle({ text }) {
+  return (
+    <h2 className="home-section__title">
+      <SplitChars text={text} stagger={0.04} />
+    </h2>
+  )
+}
+
+// 区块头：eyebrow + 字符级标题 + 编号 + 注释（滚动进场）
 function SectionHeader({ index, label, title, note }) {
   return (
     <div className="home-section__head">
       <div>
         <span className="home-section__eyebrow">{label} / {index}</span>
-        <h2 className="home-section__title">{title}</h2>
+        <SectionTitle text={title} />
       </div>
       <span className="home-section__index" aria-hidden="true">{index}</span>
       {note && <p className="home-section__note">{note}</p>}
     </div>
+  )
+}
+
+// 滚动进场容器：进入视口时淡入上浮（一次性）
+function Reveal({ children, delay = 0 }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
   )
 }
 
@@ -75,11 +120,17 @@ export default function HomePage() {
 
       {/* ─── Hero ─── */}
       <motion.section className="home-hero" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
-        <div className="home-hero__bg" aria-hidden="true">
-          <HeroParticles />
+        {/* Linear 式慢呼吸光斑：纯 CSS，30-50s 极慢变形，reduced-motion 时静止 */}
+        <div className="home-hero__glow" aria-hidden="true">
+          <div className="home-hero__blob home-hero__blob--a" />
+          <div className="home-hero__blob home-hero__blob--b" />
+          <div className="home-hero__blob home-hero__blob--c" />
         </div>
+
         <span className="home-hero__eyebrow">AI APPLICATION ENGINEER · AI 编程落地</span>
-        <h1 className="home-hero__name">{heroStatement.headline}</h1>
+        <h1 className="home-hero__name">
+          <SplitChars text={heroStatement.headline} stagger={0.07} />
+        </h1>
         <p className="home-hero__subtitle">{heroStatement.subtitle}</p>
         <p className="home-hero__tagline">{heroStatement.tagline}</p>
         <p className="home-hero__status">{heroStatement.status}</p>
@@ -105,8 +156,9 @@ export default function HomePage() {
       </div>
 
       {/* ─── 技能栈 ─── */}
-      <motion.section className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.05}>
+      <section className="home-section">
         <SectionHeader index="00" label="SKILLS" title="技能栈" />
+        <Reveal>
         {[
           { label: 'AI 技能', key: 'ai' },
           { label: '后端开发', key: 'backend' },
@@ -121,11 +173,13 @@ export default function HomePage() {
             </div>
           </div>
         ))}
-      </motion.section>
+        </Reveal>
+      </section>
 
       {/* ─── 精选项目 ─── */}
-      <motion.section id="projects" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.1}>
+      <section id="projects" className="home-section">
         <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="6 个精选开源项目：测试代理、AI 工具与实验作品。" />
+        <Reveal>
         <div className="home-projects">
           {featured.map((project, i) => (
             <a
@@ -153,8 +207,10 @@ export default function HomePage() {
             </a>
           ))}
         </div>
+        </Reveal>
 
         {/* ─── 补充项目 ─── */}
+        <Reveal delay={0.1}>
         <div className="home-more">
           <div className="home-more__label">MORE WORK · 还折腾过这些</div>
           <div className="home-more__grid">
@@ -172,11 +228,13 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </motion.section>
+        </Reveal>
+      </section>
 
       {/* ─── 成果 ─── */}
-      <motion.section id="proof" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.15}>
+      <section id="proof" className="home-section">
         <SectionHeader index="02" label="PROOF" title="看得见的成果" note="真实可核验的数据与记录。" />
+        <Reveal>
         <div className="home-proof">
           <a className="home-proof__card" href={personalInfo.github} target="_blank" rel="noopener noreferrer">
             <FolderGit2 size={22} className="home-proof__icon" />
@@ -199,11 +257,13 @@ export default function HomePage() {
             <span className="home-proof__label">ToB 项目业务落地</span>
           </a>
         </div>
-      </motion.section>
+        </Reveal>
+      </section>
 
       {/* ─── About 三事实 ─── */}
-      <motion.section id="about" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.2}>
+      <section id="about" className="home-section">
         <SectionHeader index="03" label="ABOUT" title="三个事实" note="8 年成长弧线：测试 → 项目 → AI 应用。" />
+        <Reveal>
         <div className="home-facts">
           {facts.map(fact => (
             <div key={fact.id} className="home-fact">
@@ -213,12 +273,14 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </motion.section>
+        </Reveal>
+      </section>
 
       {/* ─── 最新博客 ─── */}
       {blogPosts.length > 0 && (
-        <motion.section id="blog" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.25}>
+        <section id="blog" className="home-section">
           <SectionHeader index="04" label="WRITING" title="最新博客" note="博客园持续输出的技术文章。" />
+          <Reveal>
           <div className="home-blog">
             {blogPosts.slice(0, 5).map(post => (
               <a
@@ -233,12 +295,14 @@ export default function HomePage() {
               </a>
             ))}
           </div>
-        </motion.section>
+          </Reveal>
+        </section>
       )}
 
       {/* ─── 联系 ─── */}
-      <motion.section id="contact" className="home-section" variants={fadeUp} initial="hidden" animate="visible" custom={0.3}>
+      <section id="contact" className="home-section">
         <SectionHeader index="05" label="CONTACT" title="想聊点什么？" note="求职沟通 · 技术交流 · 项目合作，欢迎联系。" />
+        <Reveal>
         <div className="home-contact">
           <div className="home-contact__qr">
             {/* TODO(user): 用户提供微信二维码图片后替换为 public/wechat-qr.png */}
@@ -262,7 +326,8 @@ export default function HomePage() {
             </a>
           </div>
         </div>
-      </motion.section>
+        </Reveal>
+      </section>
 
       {/* ─── Footer ─── */}
       <footer className="home-footer">
