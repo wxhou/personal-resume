@@ -13,7 +13,7 @@ import featuredData from '../data/featuredProjects.json'
 import { achievements } from '../data/achievements.js'
 import { facts, heroStatement } from '../data/facts.js'
 import ScrollProgress from '../components/ScrollProgress.jsx'
-import HeroMist from '../components/HeroMist.jsx'
+import HeroDust from '../components/HeroDust.jsx'
 import './home.css'
 
 // blog.json 为构建时生成（.gitignore），用 glob 容错加载
@@ -121,9 +121,9 @@ export default function HomePage() {
 
       {/* ─── Hero ─── */}
       <motion.section className="home-hero" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
-        {/* 流雾（复刻参考站实测：极淡暖雾极慢流动），压在光斑之下内容之下 */}
+        {/* 金尘粒子（微尘在光柱里飘，鼠标轻推），压在光斑之下内容之下 */}
         <div className="home-hero__bg" aria-hidden="true">
-          <HeroMist />
+          <HeroDust />
         </div>
         {/* Linear 式慢呼吸光斑 */}
         <div className="home-hero__glow" aria-hidden="true">
