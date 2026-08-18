@@ -1,4 +1,4 @@
-/* ─── 站点导航（暖纸杂志风，独立于简历主题） ─── */
+/* ─── 站点导航（米色暖底，独立于简历主题） ─── */
 
 .site-nav {
   position: fixed;
@@ -11,15 +11,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
-  background: linear-gradient(rgba(251, 247, 241, 0.94), rgba(251, 247, 241, 0));
+  background: linear-gradient(rgba(251, 247, 241, 0.92), rgba(251, 247, 241, 0));
   backdrop-filter: blur(6px);
   color: #34302A;
   font-family: 'Noto Sans SC', -apple-system, sans-serif;
 }
 
 .site-nav__brand {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 17px;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.1em;
   color: #34302A;
@@ -33,17 +33,17 @@
 .site-nav__link {
   padding: 7px 16px;
   font-size: 14px;
-  color: #6B655C;
+  color: #6E665B;
   transition: color 150ms ease, background 150ms ease;
 }
 
 .site-nav__link:hover {
-  color: #C2705B;
-  background: rgba(194, 112, 91, 0.08);
+  color: #B86B5D;
+  background: rgba(184, 107, 93, 0.08);
 }
 
 .site-nav__link--active {
-  color: #C2705B;
+  color: #B86B5D;
   font-weight: 500;
-  background: rgba(194, 112, 91, 0.1);
+  background: rgba(184, 107, 93, 0.1);
 }

@@ -1,26 +1,26 @@
-// About 三事实（基于真实经历）
+// About 三事实：聚焦 GitHub 开源创作（不展示简历/公司项目）
 export const facts = [
   {
     id: 'FACT 01',
-    title: '测试开发起步',
-    description: '从 pytest、Selenium、Locust 自动化测试框架起步，打磨工程基本功与质量意识。',
+    title: 'AI 编程与开源',
+    description: '把 AI 编程与开源工具作为创作媒介，在 GitHub 上持续发布测试代理、AI 工具与实验作品。',
   },
   {
     id: 'FACT 02',
-    title: '项目经理四年',
-    description: '主持西安地铁智慧运维平台等 ToB 项目，需求到交付全流程负责。',
+    title: 'LangChain / RAG / Agent',
+    description: '围绕 LangChain、RAG、Dify、AI Agent 探索真实问题的端到端解法，全部以开源仓库形式记录。',
   },
   {
     id: 'FACT 03',
-    title: 'AI 应用工程师',
-    description: 'LangChain、RAG、Dify、AI Agent 落地地铁运维与室内定位业务场景，持续开源输出。',
+    title: '27+ 公开仓库',
+    description: 'GitHub @wxhou 已积累 27+ 公开仓库，覆盖自动化测试、AI 应用与开发者工具。',
   },
 ]
 
-// Hero 定位语（用户选定）
+// Hero 定位语：聚焦 GitHub 开源，不含求职/公司项目信息
 export const heroStatement = {
   headline: '用 AI 解决真实问题',
-  subtitle: '侯伟轩 · AI 应用工程师 · 西安',
-  tagline: '专注 LangChain、RAG、Dify、AI Agent 的业务落地。用 AI 编程解决真实业务问题，也折腾开源工具与自动化。',
-  status: '求职中 · AI 应用工程师 · 开放沟通',
+  subtitle: '侯伟轩 · GitHub @wxhou',
+  tagline: '把 AI 编程与开源工具作为创作媒介，全部开源在 GitHub。',
+  status: 'OPEN SOURCE · AI · WXHOU',
 }
