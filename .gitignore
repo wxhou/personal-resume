@@ -6,6 +6,7 @@ dist/
 
 # Build-time generated data
 src/data/blog.json
+src/data/github-stats.json
 
 # Local env files
 .env
@@ -34,3 +35,6 @@ yarn-error.log*
 docs/
 .gstack/
 .vercel
+
+# 临时文件（截图 / 调试日志 / heapdump）
+tmp/
