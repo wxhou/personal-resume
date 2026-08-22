@@ -47,3 +47,57 @@
   font-weight: 500;
   background: rgba(184, 107, 93, 0.1);
 }
+
+/* ─── 主题切换按钮（仅首页渲染） ─── */
+.site-nav__theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #6E665B;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.site-nav__theme-toggle:hover {
+  color: #B86B5D;
+  background: rgba(184, 107, 93, 0.08);
+}
+
+/* ─── 暗色导航：仅当首页在渲染时生效（:has 限域，/resume 不受 data-theme 影响） ─── */
+:root[data-theme="dark"]:has(.home-page) .site-nav {
+  background: linear-gradient(rgba(33, 29, 24, 0.92), rgba(33, 29, 24, 0));
+  color: #F0EAE2;
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__brand {
+  color: #F0EAE2;
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__link {
+  color: #B8AFA3;
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__link:hover {
+  color: #C97A66;
+  background: rgba(201, 122, 102, 0.1);
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__link--active {
+  color: #C97A66;
+  background: rgba(201, 122, 102, 0.12);
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__theme-toggle {
+  color: #B8AFA3;
+}
+
+:root[data-theme="dark"]:has(.home-page) .site-nav__theme-toggle:hover {
+  color: #C97A66;
+  background: rgba(201, 122, 102, 0.1);
+}

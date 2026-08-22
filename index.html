@@ -21,6 +21,13 @@
       ]
     }
     </script>
+    <!-- 默认主题：无本地记忆时默认暗色（站点身份，不随系统偏好摇摆） -->
+    <script>
+      try {
+        var t = localStorage.getItem('siteTheme') || 'dark'
+        document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

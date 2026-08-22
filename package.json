@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/fetch-blog.js",
+    "prebuild": "node scripts/fetch-blog.js && node scripts/fetch-github-stats.js",
     "build": "vite-react-ssg build && node scripts/postbuild.js",
     "preview": "vite preview"
   },
@@ -18,6 +18,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.30.4",
+    "three": "^0.185.1",
     "vite-react-ssg": "^0.8.1"
   },
   "devDependencies": {

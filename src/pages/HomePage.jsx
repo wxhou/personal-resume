@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useInView, animate, useReducedMotion } from 'framer-motion'
 import { Head } from 'vite-react-ssg'
 import '@fontsource/noto-serif-sc/400.css'
 import '@fontsource/noto-serif-sc/600.css'
@@ -13,12 +13,59 @@ import featuredData from '../data/featuredProjects.json'
 import { achievements } from '../data/achievements.js'
 import { facts, heroStatement } from '../data/facts.js'
 import ScrollProgress from '../components/ScrollProgress.jsx'
-import HeroDust from '../components/HeroDust.jsx'
+import HeroSphere from '../components/HeroSphere.jsx'
+import FxCursor from '../components/FxCursor.jsx'
+import { HOME_THEME_TOGGLE_EVENT, THEME_STORAGE_KEY } from '../lib/homeTheme.js'
 import './home.css'
 
 // blog.json 为构建时生成（.gitignore），用 glob 容错加载
 const dataFiles = import.meta.glob('../data/blog.json', { eager: true })
 const blogPosts = dataFiles['../data/blog.json']?.default ?? []
+
+// github-stats.json 为构建时生成（.gitignore），客户端 mount 后再刷新真·实时
+// 兜底值来源：2026-08-22 gh api 实测（stars=10, public_repos=104）
+const ghStatFiles = import.meta.glob('../data/github-stats.json', { eager: true })
+const initialGhStats = ghStatFiles['../data/github-stats.json']?.default ?? { stars: 10, repos: 104 }
+
+// GitHub 公开数据实时刷新：构建值为初始，mount 后拉 GitHub REST API 覆盖
+// API 来源: https://docs.github.com/en/rest/repos/repos · /rest/users/users（未认证 60 req/h/IP）
+// sessionStorage 缓存 10 分钟防限流；全部失败时静默保留构建值
+function useGitHubStats(initial) {
+  const [stats, setStats] = useState(initial)
+  const statsRef = useRef(initial)
+  statsRef.current = stats
+
+  useEffect(() => {
+    const CACHE_KEY = 'gh-stats-v1'
+    const TTL = 10 * 60 * 1000
+    let cancelled = false
+
+    try {
+      const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null')
+      if (cached && Date.now() - cached.t < TTL && cached.stats) {
+        setStats(cached.stats)
+        return () => { cancelled = true }
+      }
+    } catch { /* sessionStorage 不可用时直接请求 */ }
+
+    Promise.allSettled([
+      fetch('https://api.github.com/repos/wxhou/openspec-playwright').then(r => (r.ok ? r.json() : null)),
+      fetch('https://api.github.com/users/wxhou').then(r => (r.ok ? r.json() : null)),
+    ]).then(([repo, user]) => {
+      if (cancelled) return
+      const stars = repo.status === 'fulfilled' ? repo.value?.stargazers_count : null
+      const repos = user.status === 'fulfilled' ? user.value?.public_repos : null
+      if (stars == null && repos == null) return // 全部失败保留构建值
+      const prev = statsRef.current
+      const next = { stars: stars ?? prev.stars, repos: repos ?? prev.repos }
+      setStats(next)
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), stats: next })) } catch { /* 忽略 */ }
+    })
+    return () => { cancelled = true }
+  }, [])
+
+  return stats
+}
 
 const { featured, more } = featuredData
 
@@ -115,15 +162,166 @@ function Reveal({ children, delay = 0 }) {
   )
 }
 
-export default function HomePage() {
-  // 首页强制米色暖底（参考站 jingjinglearns.cc 设计语言）
+// 数字滚动进场（参考站 lab-panel 同款）：进入视口后从 0 滚到目标值，1.1s easeInOut
+// prefix/suffix 显式传参（如 ⭐ / + / 篇），不做字符串猜测解析
+// value 运行时更新（GitHub 实时刷新）时从当前显示值平滑滚到新目标，不从 0 重滚
+// reduced-motion 直接渲染最终值
+function CountUp({ value, prefix = '', suffix = '', delay = 0 }) {
+  const ref = useRef(null)
+  const currentRef = useRef(0) // 当前显示值，value 变化时的滚动起点
+  const inView = useInView(ref, { once: true, amount: 0.4 })
+  const reduced = useReducedMotion()
+  const finalText = `${prefix}${value}${suffix}`
+
   useEffect(() => {
-    document.body.style.background = '#FBF7F1'
+    if (!inView || !ref.current) return
+    if (reduced) {
+      currentRef.current = value
+      ref.current.textContent = finalText
+      return
+    }
+    const controls = animate(currentRef.current, value, {
+      duration: 1.1,
+      delay,
+      ease: 'easeInOut',
+      onUpdate: (v) => {
+        const n = Math.round(v)
+        currentRef.current = n
+        if (ref.current) ref.current.textContent = `${prefix}${n}${suffix}`
+      },
+    })
+    return () => controls.stop()
+  }, [inView, reduced, value, prefix, suffix, delay])
+
+  return <span ref={ref}>{reduced ? finalText : `${prefix}0${suffix}`}</span>
+}
+
+export default function HomePage() {
+  // GitHub 数据：构建值打底，客户端实时刷新
+  const githubStats = useGitHubStats(initialGhStats)
+
+  // 明暗主题：FOUC 内联脚本已在首帧前把 data-theme 写到 <html>，这里读取并接管。
+  // 归一化防御：/resume 的 style-switcher 会把 html data-theme 改成 "original" 等
+  // 自有值，SPA 返回首页时以合法值优先、localStorage 记忆兜底
+  const [theme, setTheme] = useState(() => {
+    if (typeof document === 'undefined') return 'light'
+    const t = document.documentElement.dataset.theme
+    if (t === 'dark' || t === 'light') return t
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY)
+      if (saved === 'dark' || saved === 'light') return saved
+    } catch { /* 忽略 */ }
+    return 'dark' // 默认暗色（站点身份，不随系统偏好）
+  })
+
+  // SiteNav 的 toggle 按钮经自定义事件桥接（两者无父子数据流）
+  useEffect(() => {
+    const onToggle = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))
+    window.addEventListener(HOME_THEME_TOGGLE_EVENT, onToggle)
+    return () => window.removeEventListener(HOME_THEME_TOGGLE_EVENT, onToggle)
+  }, [])
+
+  // theme 变化：同步 <html> data-theme + localStorage 持久化
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem(THEME_STORAGE_KEY, theme) } catch { /* 隐私模式等场景忽略 */ }
+  }, [theme])
+
+  // 首页强制暖底（亮 #FBF7F1 / 暗 #211D18），离开首页恢复
+  useEffect(() => {
+    document.body.style.background = theme === 'dark' ? '#211D18' : '#FBF7F1'
     return () => { document.body.style.background = '' }
+  }, [theme])
+
+  // 卡片光斑跟随：pointermove 写 --mx/--my，enter/leave 切 is-glowing（参考站 .card 同款）
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const noHover = window.matchMedia('(hover: none)').matches
+    if (reduced || noHover) return
+    const cards = document.querySelectorAll('.home-project, .home-more__item, .home-proof__card, .home-fact')
+    const onMove = (e) => {
+      const r = e.currentTarget.getBoundingClientRect()
+      e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`)
+      e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`)
+    }
+    const onEnter = (e) => e.currentTarget.classList.add('is-glowing')
+    const onLeave = (e) => e.currentTarget.classList.remove('is-glowing')
+    cards.forEach((card) => {
+      card.addEventListener('pointermove', onMove)
+      card.addEventListener('pointerenter', onEnter)
+      card.addEventListener('pointerleave', onLeave)
+    })
+    return () => {
+      cards.forEach((card) => {
+        card.removeEventListener('pointermove', onMove)
+        card.removeEventListener('pointerenter', onEnter)
+        card.removeEventListener('pointerleave', onLeave)
+      })
+    }
+  }, [])
+
+  // 首屏滚动视差（参考站同款）：内容 y*0.18 渐隐、粒子层 y*0.08、SCROLL 提示 y>60 淡出，rAF 合帧
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) return
+    const heroInner = document.querySelector('.home-hero__inner')
+    const heroBg = document.querySelector('.home-hero__bg')
+    const scrollHint = document.querySelector('.home-hero__scroll')
+    if (!heroInner) return
+    let tick = false
+    const onScroll = () => {
+      if (tick) return
+      tick = true
+      requestAnimationFrame(() => {
+        tick = false
+        const y = window.scrollY
+        const vh = window.innerHeight
+        if (scrollHint) scrollHint.style.opacity = y > 60 ? 0 : 1
+        if (y > vh) return // 超出首屏跳过无效计算
+        heroInner.style.transform = `translateY(${(y * 0.18).toFixed(1)}px)`
+        heroInner.style.opacity = String(Math.max(0, 1 - y / (vh * 0.85)))
+        if (heroBg) heroBg.style.transform = `translateY(${(y * 0.08).toFixed(1)}px)`
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // 磁吸按钮：鼠标进入 CTA 周边 100px 时向光标位移 30%，离开回弹
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const noHover = window.matchMedia('(hover: none)').matches
+    if (reduced || noHover) return
+    const zone = document.querySelector('.home-hero__ctas')
+    const btn = zone?.querySelector('.home-hero__cta')
+    if (!btn) return
+    const RADIUS = 100
+    const PULL = 0.3
+    const onMove = (e) => {
+      const r = btn.getBoundingClientRect()
+      const near =
+        e.clientX > r.left - RADIUS && e.clientX < r.right + RADIUS &&
+        e.clientY > r.top - RADIUS && e.clientY < r.bottom + RADIUS
+      if (near) {
+        const cx = r.left + r.width / 2
+        const cy = r.top + r.height / 2
+        btn.classList.add('is-magnet')
+        btn.style.transform = `translate(${(e.clientX - cx) * PULL}px, ${(e.clientY - cy) * PULL}px)`
+      } else if (btn.style.transform) {
+        btn.classList.remove('is-magnet') // 回落到 300ms transition，形成回弹
+        btn.style.removeProperty('transform')
+      }
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      btn.classList.remove('is-magnet')
+      btn.style.removeProperty('transform')
+    }
   }, [])
 
   return (
-    <div className="home-page">
+    <div className="home-page fx-cursor">
       <Head>
         <title>侯伟轩 - AI应用工程师</title>
         <meta name="description" content="侯伟轩的个人主页：AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
@@ -137,6 +335,9 @@ export default function HomePage() {
 
       {/* ─── 滚动进度条 ─── */}
       <ScrollProgress />
+
+      {/* ─── 自定义光标 ─── */}
+      <FxCursor />
 
       {/* ─── Hero ─── */}
       <motion.section className="home-hero" variants={heroEnter} initial="hidden" animate="visible" custom={0}>
@@ -160,7 +361,7 @@ export default function HomePage() {
         </svg>
         {/* 金尘粒子（暖色三色：森林 / 赭土 / 米雾），压在椭圆之下内容之下 */}
         <div className="home-hero__bg" aria-hidden="true">
-          <HeroDust />
+          <HeroSphere dark={theme === 'dark'} />
         </div>
 
         {/* 控制台面板：GitHub 开源读数（签名元素） */}
@@ -177,7 +378,7 @@ export default function HomePage() {
             <span className="home-hero__console-key">repos</span>
           </div>
           <div className="home-hero__console-line">
-            <span className="home-hero__console-val">27+ public</span>
+            <span className="home-hero__console-val">{githubStats.repos}+ public</span>
           </div>
           <div className="home-hero__console-line">
             <span className="home-hero__console-prompt">$</span>
@@ -199,6 +400,8 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Hero 内容包装层：滚动视差 transform/opacity 的承载者 */}
+        <div className="home-hero__inner">
         <span className="home-hero__eyebrow">AI APPLICATION ENGINEER · AI 编程落地</span>
         <h1 className="home-hero__name">
           <SplitChars text={heroStatement.headline.slice(0, -2)} stagger={0.07} />
@@ -214,6 +417,22 @@ export default function HomePage() {
         </h1>
         <p className="home-hero__subtitle">{heroStatement.subtitle}</p>
         <p className="home-hero__tagline">{heroStatement.tagline}</p>
+        {/* 身份徽章行：Creator of + 精选项目 chip（antfu/pseudoyu 同款） */}
+        <div className="home-idbadge-row">
+          <span className="home-idbadge-row__label">Creator of</span>
+          {featured.map(project => (
+            <a
+              key={project.name}
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="home-idbadge"
+            >
+              <span className="home-idbadge__mono" aria-hidden="true">{project.name.slice(0, 2)}</span>
+              {project.name}
+            </a>
+          ))}
+        </div>
         <p className="home-hero__status">{heroStatement.status}</p>
         <div className="home-hero__ctas">
           <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-hero__cta">
@@ -222,9 +441,18 @@ export default function HomePage() {
             <ArrowRight size={16} />
           </a>
         </div>
+        {/* Hero 实时数据行：与成果区同源的 GitHub 实时数据（innei 同款克制小字） */}
+        <div className="home-hero__stats" aria-label="GitHub 与博客数据">
+          <span><b>{githubStats.repos}</b> 仓库</span>
+          <span className="home-hero__stats-sep">·</span>
+          <span>⭐<b>{githubStats.stars}</b></span>
+          <span className="home-hero__stats-sep">·</span>
+          <span><b>{blogPosts.length}</b> 篇</span>
+        </div>
         <div className="home-hero__scroll" aria-hidden="true">
           SCROLL
           <ArrowDown size={14} />
+        </div>
         </div>
       </motion.section>
 
@@ -320,17 +548,17 @@ export default function HomePage() {
         <div className="home-proof">
           <a className="home-proof__card" href={personalInfo.github} target="_blank" rel="noopener noreferrer">
             <FolderGit2 size={22} className="home-proof__icon" />
-            <span className="home-proof__value">27+</span>
+            <span className="home-proof__value"><CountUp value={githubStats.repos} suffix="+" /></span>
             <span className="home-proof__label">GitHub 公开仓库</span>
           </a>
           <a className="home-proof__card" href="https://github.com/wxhou/openspec-playwright" target="_blank" rel="noopener noreferrer">
             <Star size={22} className="home-proof__icon" />
-            <span className="home-proof__value">⭐8</span>
+            <span className="home-proof__value"><CountUp value={githubStats.stars} prefix="⭐" delay={0.09} /></span>
             <span className="home-proof__label">openspec-playwright 开源 star</span>
           </a>
           <a className="home-proof__card" href="https://www.cnblogs.com/wxhou" target="_blank" rel="noopener noreferrer">
             <FileText size={22} className="home-proof__icon" />
-            <span className="home-proof__value">20 篇</span>
+            <span className="home-proof__value"><CountUp value={20} suffix=" 篇" delay={0.18} /></span>
             <span className="home-proof__label">博客园技术文章</span>
           </a>
         </div>

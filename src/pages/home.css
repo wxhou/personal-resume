@@ -48,7 +48,10 @@
 
   min-height: 100vh;
   padding-top: 64px; /* site nav height */
-  background: var(--bg-page);
+  background-color: var(--bg-page);
+  /* 点阵纸纹（antfu/pseudoyu 同款 dotted grid）：米底上的印刷纸肌理 */
+  background-image: radial-gradient(rgba(52, 48, 42, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
   color: var(--text-base);
   font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
   font-size: var(--fs-body);
@@ -95,7 +98,13 @@
 .home-hero {
   position: relative;
   z-index: 1;
-  padding: 96px 72px 0;
+  /* 首屏高度（扣除 64px nav）：让粒子画布铺满视口，与参考站 #scene(100vh) 构图一致
+     —— gl_PointSize ∝ 画布高度，容器矮会导致粒子缩小 ~40% */
+  min-height: calc(100svh - 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 96px 72px;
   text-align: left;
   max-width: 1280px;
   margin: 0 auto;
@@ -119,10 +128,21 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  pointer-events: none;
+  pointer-events: auto; /* 接收 pointermove 让 raycast 跟随 */
+  will-change: transform; /* 滚动视差 translateY(y*0.08) */
 }
 
-.hero-dust {
+/* Hero 内容包装层：滚动视差的 transform/opacity 承载者
+   （与 framer-motion 进场动画分层——进场在 section 根，视差在此层） */
+.home-hero__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.hero-sphere {
   width: 100%;
   height: 100%;
   display: block;
@@ -258,6 +278,107 @@
   z-index: 2;
 }
 
+/* ─── 身份徽章行（antfu/pseudoyu 同款：Creator of + 项目 chip） ─── */
+.home-idbadge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 30px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 桌面端避开右上角控制台面板（absolute 定位，宽约 372px），防止 chip 被遮不可点 */
+@media (min-width: 1025px) {
+  .home-idbadge-row {
+    max-width: 720px;
+  }
+}
+
+.home-idbadge-row__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-right: 4px;
+}
+
+.home-idbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 6px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-small);
+  color: var(--text-base);
+  transition: border-color var(--dur-out) var(--ease-out),
+              color var(--dur-out) var(--ease-out),
+              transform var(--dur-out) var(--ease-out);
+}
+
+.home-page .home-idbadge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* monogram 方块：三色轮换（label 是 span，chip 是 a，nth-of-type 按 a 计数） */
+.home-idbadge:nth-of-type(3n + 1) .home-idbadge__mono {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.home-idbadge:nth-of-type(3n + 2) .home-idbadge__mono {
+  background: rgba(52, 48, 42, 0.07);
+  color: var(--text-strong);
+}
+.home-idbadge:nth-of-type(3n) .home-idbadge__mono {
+  background: rgba(184, 107, 93, 0.16);
+  color: #8a4d3d;
+}
+
+.home-idbadge__mono {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
+/* ─── Hero 实时数据行（innei 同款：一行安静的事实） ─── */
+.home-hero__stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 28px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-small);
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums slashed-zero;
+  position: relative;
+  z-index: 2;
+}
+
+.home-hero__stats b {
+  color: var(--text-base);
+  font-weight: 500;
+}
+
+.home-hero__stats-sep {
+  color: var(--surface-border-strong);
+}
+
 .home-hero__ctas {
   display: flex;
   gap: 14px;
@@ -298,9 +419,15 @@
   background: var(--accent-soft);
 }
 
-/* SCROLL 提示 */
+/* 磁吸态：快速跟随（离开时回落到上方 300ms transition，形成回弹） */
+.home-hero__cta.is-magnet {
+  transition: transform 0.12s ease-out;
+}
+
+/* SCROLL 提示（钉在首屏底部，参考站布局；滚动视差时淡出） */
 .home-hero__scroll {
-  margin-top: 48px;
+  margin-top: auto;
+  padding-top: 48px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -311,6 +438,7 @@
   color: var(--text-soft);
   position: relative;
   z-index: 2;
+  transition: opacity var(--dur-out) var(--ease-out);
 }
 
 /* ─── 成就滚动条 ─── */
@@ -788,6 +916,157 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-soft);
+}
+
+/* ─── 卡片光斑跟随（参考站 .card 同款：--mx/--my + 径向光晕） ─── */
+.home-project,
+.home-more__item,
+.home-proof__card,
+.home-fact {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-project::after,
+.home-more__item::after,
+.home-proof__card::after,
+.home-fact::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(184, 107, 93, 0.08),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-out) var(--ease-out);
+  pointer-events: none;
+}
+
+.home-project.is-glowing::after,
+.home-more__item.is-glowing::after,
+.home-proof__card.is-glowing::after,
+.home-fact.is-glowing::after {
+  opacity: 1;
+}
+
+/* ─── 暗色主题（暖深褐，与亮色暖色语言同源；data-theme 挂 <html>，FOUC 脚本首帧前写入） ─── */
+:root[data-theme="dark"] .home-page {
+  --bg-page: #211D18;
+  --bg-soft: #2A251F;
+  --surface: #2E2924;
+  --surface-border: rgba(240, 234, 226, 0.08);
+  --surface-border-strong: rgba(240, 234, 226, 0.16);
+  --text-strong: #F0EAE2;
+  --text-base: #B8AFA3;
+  --text-soft: #8F867A;
+  /* accent 提亮：#B86B5D 在 #211D18 上对比 ~3.2:1 不达标，提亮后 ~4.6:1 过 AA */
+  --accent: #C97A66;
+  --accent-hover: #D48973;
+  --accent-soft: rgba(201, 122, 102, 0.14);
+
+  background-color: var(--bg-page);
+  /* 点阵纹理换浅色点，α 提高至暗底可辨（亮色版是暖深色点 0.06） */
+  background-image: radial-gradient(rgba(240, 234, 226, 0.07) 1px, transparent 1px);
+}
+
+/* 暗色氛围光：深赭红椭圆光晕透过粒子云提供纵深（纯 CSS 零 DOM，不拦截交互） */
+:root[data-theme="dark"] .home-page .home-hero__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* canvas 之上、内容（z-index 2）之下 */
+  background: radial-gradient(
+    ellipse 60% 50% at 60% 38%,
+    rgba(201, 122, 102, 0.08),
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+/* 暗色下卡片光斑增强：色随暗色 accent、透明度提高 */
+:root[data-theme="dark"] .home-project::after,
+:root[data-theme="dark"] .home-more__item::after,
+:root[data-theme="dark"] .home-proof__card::after,
+:root[data-theme="dark"] .home-fact::after {
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(201, 122, 102, 0.12),
+    transparent 60%
+  );
+}
+
+/* 暗色下硬编码亮色表面的覆写 */
+:root[data-theme="dark"] .home-page .home-hero__console {
+  background: rgba(46, 41, 36, 0.72);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .home-page .home-project:hover {
+  background: #35302A;
+}
+
+/* ─── 自定义光标（三层：dot + ring + canvas） ─── */
+
+/* hover 设备隐藏原生光标 */
+@media (hover: hover) and (pointer: fine) {
+  .home-page.fx-cursor,
+  .home-page.fx-cursor a,
+  .home-page.fx-cursor button {
+    cursor: none;
+  }
+}
+
+.fx-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+  pointer-events: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent, #B86B5D);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.fx-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  pointer-events: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent, #B86B5D);
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s, background 0.3s, border-color 0.3s;
+}
+
+.fx-ring.hot {
+  background: rgba(184, 107, 93, 0.08);
+  border-color: var(--accent, #B86B5D);
+}
+
+.fx-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* 无障碍降级 */
+@media (prefers-reduced-motion: reduce) {
+  .fx-dot, .fx-ring, .fx-canvas {
+    display: none;
+  }
+  .hero-sphere {
+    display: none;
+  }
 }
 
 /* ─── Responsive ─── */
