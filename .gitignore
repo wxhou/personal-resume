@@ -38,3 +38,23 @@ docs/
 
 # 临时文件（截图 / 调试日志 / heapdump）
 tmp/
+
+# ─── 本地工具链 / AI 环境 / 规格目录（不入版本控制） ───
+.claude/
+.github/
+.roo/
+.codex/
+.cursor/
+.codegraph/
+.dsh/
+.mcp.json
+.omp/
+.opencode/
+.pi/
+.playwright-mcp/
+.superpowers/
+opencode.jsonc
+AGENTS.md
+CLAUDE.md
+tests/
+openspec/
