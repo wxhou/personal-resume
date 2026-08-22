@@ -28,9 +28,9 @@ export default function SiteNav() {
   return (
     <nav className="site-nav" aria-label="站点导航">
       {onHome ? (
-        <Link to="/" className="site-nav__brand">侯伟轩</Link>
+        <Link to="/" className="site-nav__brand">Bigger蓝莓</Link>
       ) : (
-        <NavLink to="/" className="site-nav__brand">侯伟轩</NavLink>
+        <NavLink to="/" className="site-nav__brand">Bigger蓝莓</NavLink>
       )}
       <div className="site-nav__links">
         {onHome ? (
@@ -40,12 +40,7 @@ export default function SiteNav() {
                 {anchor.label}
               </a>
             ))}
-            <NavLink
-              to="/resume"
-              className={({ isActive }) => `site-nav__link${isActive ? ' site-nav__link--active' : ''}`}
-            >
-              简历
-            </NavLink>
+            {/* 简历入口暂时隐藏（路由已重定向回首页；恢复时补回 NavLink to="/resume"） */}
           </>
         ) : (
           <>

@@ -264,20 +264,6 @@
   z-index: 2;
 }
 
-.home-hero__status {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: var(--fs-small);
-  letter-spacing: 0.08em;
-  color: var(--accent);
-  border: 1px solid var(--accent-soft);
-  padding: 6px 16px;
-  margin: 0 0 34px;
-  background: rgba(184, 107, 93, 0.04);
-  position: relative;
-  z-index: 2;
-}
-
 /* ─── 身份徽章行（antfu/pseudoyu 同款：Creator of + 项目 chip） ─── */
 .home-idbadge-row {
   display: flex;
@@ -439,48 +425,6 @@
   position: relative;
   z-index: 2;
   transition: opacity var(--dur-out) var(--ease-out);
-}
-
-/* ─── 成就滚动条 ─── */
-.home-marquee {
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-  background: var(--bg-soft);
-  border-top: 1px solid var(--surface-border);
-  border-bottom: 1px solid var(--surface-border);
-  padding: 20px 0;
-}
-
-.home-marquee__track {
-  display: flex;
-  gap: 48px;
-  width: max-content;
-  animation: home-marquee-scroll 30s linear infinite;
-}
-
-.home-marquee__item {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: var(--fs-small);
-  color: var(--text-base);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums slashed-zero;
-}
-
-.home-marquee__item::before {
-  content: '◆';
-  color: var(--accent);
-  margin-right: 12px;
-  font-size: 10px;
-}
-
-@keyframes home-marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-marquee__track { animation: none; }
 }
 
 /* ─── Section（瑞士印刷：偏移网格 + 大量留白） ─── */
@@ -851,24 +795,31 @@
   gap: 12px;
 }
 
-.home-contact__qr-placeholder {
+/* QQ 群二维码（深底图，亮色下加浅边框保持清晰边界） */
+.home-contact__qr img {
   width: 148px;
   height: 148px;
-  border: 1.5px dashed var(--surface-border-strong);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: var(--fs-body);
-  color: var(--text-soft);
-  line-height: 1.7;
-  background: var(--bg-soft);
+  border-radius: 8px;
+  border: 1px solid var(--surface-border-strong);
+  transition: transform var(--dur-out) var(--ease-out);
+}
+
+.home-contact__qr a:hover img {
+  transform: translateY(-2px);
 }
 
 .home-contact__qr-label {
   font-size: var(--fs-small);
   color: var(--text-base);
+}
+
+/* star 图标（替代 emoji ⭐：跨平台渲染不一致且与线性图标语言不符） */
+.star-icon {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 4px;
+  color: var(--accent);
+  fill: var(--accent); /* 实心星 = 已获得的 star */
 }
 
 .home-contact__links {

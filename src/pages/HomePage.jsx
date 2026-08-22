@@ -10,7 +10,6 @@ import '@fontsource/noto-sans-sc/700.css'
 import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, FileText, FolderGit2 } from 'lucide-react'
 import { personalInfo, skills, personalLinks } from '../data/resume.js'
 import featuredData from '../data/featuredProjects.json'
-import { achievements } from '../data/achievements.js'
 import { facts, heroStatement } from '../data/facts.js'
 import ScrollProgress from '../components/ScrollProgress.jsx'
 import HeroSphere from '../components/HeroSphere.jsx'
@@ -323,9 +322,9 @@ export default function HomePage() {
   return (
     <div className="home-page fx-cursor">
       <Head>
-        <title>侯伟轩 - AI应用工程师</title>
-        <meta name="description" content="侯伟轩的个人主页：AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
-        <meta property="og:title" content="侯伟轩 - AI应用工程师" />
+        <title>Bigger蓝莓 - AI应用工程师</title>
+        <meta name="description" content="Bigger蓝莓的个人主页：AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
+        <meta property="og:title" content="Bigger蓝莓 - AI应用工程师" />
         <meta property="og:description" content="AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
         <meta property="og:image" content="https://wxhou.vercel.app/og-image.png" />
         <meta property="og:type" content="profile" />
@@ -433,7 +432,6 @@ export default function HomePage() {
             </a>
           ))}
         </div>
-        <p className="home-hero__status">{heroStatement.status}</p>
         <div className="home-hero__ctas">
           <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-hero__cta">
             <Github size={16} />
@@ -445,7 +443,7 @@ export default function HomePage() {
         <div className="home-hero__stats" aria-label="GitHub 与博客数据">
           <span><b>{githubStats.repos}</b> 仓库</span>
           <span className="home-hero__stats-sep">·</span>
-          <span>⭐<b>{githubStats.stars}</b></span>
+          <span><Star size={13} className="star-icon" /><b>{githubStats.stars}</b></span>
           <span className="home-hero__stats-sep">·</span>
           <span><b>{blogPosts.length}</b> 篇</span>
         </div>
@@ -455,15 +453,6 @@ export default function HomePage() {
         </div>
         </div>
       </motion.section>
-
-      {/* ─── 成就滚动条 ─── */}
-      <div className="home-marquee" aria-label="成就速览">
-        <div className="home-marquee__track">
-          {[...achievements, ...achievements].map((text, i) => (
-            <span key={i} className="home-marquee__item">●{text}</span>
-          ))}
-        </div>
-      </div>
 
       {/* ─── 技能栈 ─── */}
       <section className="home-section">
@@ -553,7 +542,7 @@ export default function HomePage() {
           </a>
           <a className="home-proof__card" href="https://github.com/wxhou/openspec-playwright" target="_blank" rel="noopener noreferrer">
             <Star size={22} className="home-proof__icon" />
-            <span className="home-proof__value"><CountUp value={githubStats.stars} prefix="⭐" delay={0.09} /></span>
+            <span className="home-proof__value"><CountUp value={githubStats.stars} delay={0.09} /></span>
             <span className="home-proof__label">openspec-playwright 开源 star</span>
           </a>
           <a className="home-proof__card" href="https://www.cnblogs.com/wxhou" target="_blank" rel="noopener noreferrer">
@@ -565,9 +554,9 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      {/* ─── About 三事实 ─── */}
+      {/* ─── About 事实卡 ─── */}
       <section id="about" className="home-section">
-        <SectionHeader index="03" label="ABOUT" title="三个事实" note="GitHub 开源创作的三条主线。" />
+        <SectionHeader index="03" label="ABOUT" title="两个事实" note="GitHub 开源创作的两条主线。" />
         <Reveal>
         <div className="home-facts">
           {facts.map(fact => (
@@ -610,9 +599,28 @@ export default function HomePage() {
         <Reveal>
         <div className="home-contact">
           <div className="home-contact__qr">
-            {/* TODO(user): 用户提供微信二维码图片后替换为 public/wechat-qr.png */}
-            <div className="home-contact__qr-placeholder" aria-label="微信二维码占位">二维码<br />待提供</div>
-            <span className="home-contact__qr-label">微信</span>
+            <a href="/qq-group-qr.png" target="_blank" rel="noopener noreferrer" aria-label="放大 QQ 群二维码">
+              <img
+                src="/qq-group-qr.png"
+                alt="QQ 群「AI agent 学习交流」入群二维码"
+                width={148}
+                height={148}
+                loading="lazy"
+              />
+            </a>
+            <span className="home-contact__qr-label">QQ 群 · AI agent 学习交流</span>
+          </div>
+          <div className="home-contact__qr">
+            <a href="/wechat-qr.png" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
+              <img
+                src="/wechat-qr.png"
+                alt="微信二维码，扫一扫添加好友"
+                width={148}
+                height={148}
+                loading="lazy"
+              />
+            </a>
+            <span className="home-contact__qr-label">微信 · 随风挥手</span>
           </div>
           <div className="home-contact__links">
             <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-contact__link">

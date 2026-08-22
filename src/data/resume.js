@@ -1,11 +1,8 @@
 // ─── Resume Data ───────────────────────────────────────────
 export const personalInfo = {
-  name: '侯伟轩',
+  name: 'Bigger蓝莓',
   title: 'AI应用工程师',
-  salary: '¥18K – 20K',
-  phone: '18291900215',
   email: 'hooupythonic@gmail.com',
-  location: '西安',
   github: 'https://github.com/wxhou',
   education: {
     school: '陕西职业技术学院',

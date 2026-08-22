@@ -31,22 +31,30 @@ import {
 // brass 0xC2705B，每 6 个粒子 1 个 brass（sage 见 sageColor 归一化对象）
 const BRASS = 0xc2705b
 
-// 粒子双色板：亮色为原值（NormalBlending）；暗色提亮（AdditiveBlending 下叠加增亮呈星云感）
+// 粒子双主题参数：亮色需深化色板/加大尺寸/减弱雾以抵消米底低对比；
+// 暗色 additive+提亮呈星云（浅底下 additive 会过曝不可见，故仅暗色启用）
 const PALETTES = {
   light: {
-    sage: { r: 0.494, g: 0.58, b: 0.475 },   // #7E9479
-    brass: { r: 0.76, g: 0.439, b: 0.357 },  // #C2705B
+    sage: { r: 0.392, g: 0.502, b: 0.361 },  // #64805C 深绿（对米底 4.1:1，原 #7E9479 仅 3.1:1）
+    brass: { r: 0.627, g: 0.322, b: 0.220 }, // #A05238 深红棕（5.2:1，原 #C2705B 仅 3.4:1）
+    size: 0.075, // 原 0.06 在米底上仅 2-3px 几乎不可辨
+    fogDensity: 0.038, // 减弱雾洗，远处粒子不再融进米底
   },
   dark: {
     sage: { r: 0.588, g: 0.675, b: 0.565 },  // #96AC90
     brass: { r: 0.831, g: 0.537, b: 0.451 }, // #D48973
+    size: 0.06,
+    fogDensity: 0.05,
   },
 }
+
+// 同构安全的 layout effect（SSG 预渲染阶段退化为 useEffect，消除 SSR warning）
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export default function HeroSphere({ dark = false }) {
   const canvasRef = useRef(null)
   const sceneRef = useRef(null) // fog 联动用：dark prop 变化时改雾色不重建场景
-  const applyDarkRef = useRef(null) // 星云切换（blending + 色板），由 init 注入
+  const applyThemeRef = useRef(null) // 主题参数应用（blending/色板/尺寸/雾），由 init 注入
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -122,29 +130,33 @@ export default function HeroSphere({ dark = false }) {
     geo.setDrawRange(0, drawCount)
 
     const colors = new Float32Array(COUNT * 3)
-    // 星云切换：色板 + blending 一体应用（暗色 additive+提亮，亮色 normal+原值）
-    const applyDark = (isDark) => {
-      const { sage, brass } = isDark ? PALETTES.dark : PALETTES.light
+    // 主题参数一体应用：色板 + blending + 尺寸 + 雾密度
+    const applyTheme = (isDark) => {
+      const p = isDark ? PALETTES.dark : PALETTES.light
       for (let i = 0; i < COUNT; i++) {
-        const c = i % 6 === 0 ? brass : sage
+        const c = i % 6 === 0 ? p.brass : p.sage
         colors[i * 3] = c.r
         colors[i * 3 + 1] = c.g
         colors[i * 3 + 2] = c.b
       }
       geo.attributes.color && (geo.attributes.color.needsUpdate = true) // 颜色生效的必要条件
-      if (material) material.blending = isDark ? AdditiveBlending : NormalBlending
+      if (material) {
+        material.blending = isDark ? AdditiveBlending : NormalBlending
+        material.size = p.size
+      }
+      if (scene.fog) scene.fog.density = p.fogDensity
     }
     geo.setAttribute('color', new BufferAttribute(colors, 3))
 
     const material = new PointsMaterial({
-      size: 0.06,
+      size: PALETTES[dark ? 'dark' : 'light'].size,
       vertexColors: true,
       transparent: true,
       opacity: 0.92,
       depthWrite: false,
     })
-    applyDark(dark) // init 即按当前主题初始化，防暗色访客首帧闪现亮板
-    applyDarkRef.current = applyDark
+    applyTheme(dark) // init 即按当前主题初始化，防暗色访客首帧闪现亮板
+    applyThemeRef.current = applyTheme
     const points = new Points(geo, material)
     scene.add(points)
 
@@ -302,9 +314,9 @@ export default function HeroSphere({ dark = false }) {
     s.fog.color.set(dark ? 0x211d18 : 0xfbf7f1)
   }, [dark])
 
-  // 星云切换（useLayoutEffect：commit 后、绘制前执行，防暗色首帧闪现亮板）
-  useLayoutEffect(() => {
-    applyDarkRef.current?.(dark)
+  // 星云切换（同构 layout effect：commit 后、绘制前执行，防暗色首帧闪现亮板）
+  useIsomorphicLayoutEffect(() => {
+    applyThemeRef.current?.(dark)
   }, [dark])
 
   return <canvas ref={canvasRef} className="hero-sphere" aria-hidden="true" />

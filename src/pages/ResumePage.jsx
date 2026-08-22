@@ -83,7 +83,7 @@ export default function ResumePage() {
     const { default: html2pdf } = await import('html2pdf.js')
     const opt = {
       margin: 2,
-      filename: '侯伟轩_个人简历.pdf',
+      filename: 'Bigger蓝莓_个人简历.pdf',
       image: { type: 'png', quality: 1 },
       html2canvas: {
         scale: 2,
@@ -119,7 +119,7 @@ export default function ResumePage() {
       backgroundColor: theme === 'dark' ? '#09090B' : theme === 'editorial' ? '#F9F7F4' : '#ffffff'
     })
     const link = document.createElement('a')
-    link.download = '侯伟轩_个人简历.png'
+    link.download = 'Bigger蓝莓_个人简历.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
@@ -127,8 +127,8 @@ export default function ResumePage() {
   return (
     <div className="min-h-screen pl-[56px]" style={{ background: 'var(--bg-page)', transition: 'background 300ms ease-out' }}>
       <Head>
-        <title>侯伟轩 - 个人简历</title>
-        <meta name="description" content="侯伟轩的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。" />
+        <title>Bigger蓝莓 - 个人简历</title>
+        <meta name="description" content="Bigger蓝莓的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。" />
       </Head>
       {/* Theme Switcher - Left Sidebar */}
       <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
