@@ -608,9 +608,9 @@ export default function HomePage() {
         <div className="home-contact">
           {/* 转化优先级（评审 P0-1）：微信(标身份) > 邮箱实名 > GitHub > 平台 > QQ 群 */}
           <div className="home-contact__qr">
-            <a href="/wechat-qr.png" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
+            <a href="/wechat-qr.webp" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
               <img
-                src="/wechat-qr.png"
+                src="/wechat-qr.webp"
                 alt="微信二维码，扫一扫添加好友"
                 width={148}
                 height={148}
@@ -635,7 +635,7 @@ export default function HomePage() {
                 {link.name}
               </a>
             ))}
-            <a href="/qq-group-qr.png" target="_blank" rel="noopener noreferrer" className="home-contact__link">
+            <a href="/qq-group-qr.webp" target="_blank" rel="noopener noreferrer" className="home-contact__link">
               <ExternalLink size={15} />
               QQ 群 · AI agent 学习交流
             </a>
