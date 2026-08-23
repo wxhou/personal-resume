@@ -554,9 +554,9 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      {/* ─── About 事实卡 ─── */}
+      {/* ─── About 事实 + 落地案例 ─── */}
       <section id="about" className="home-section">
-        <SectionHeader index="03" label="ABOUT" title="两个事实" note="GitHub 开源创作的两条主线。" />
+        <SectionHeader index="03" label="ABOUT" title="关于" note="创作主线与真实场景的 AI 落地。" />
         <Reveal>
         <div className="home-facts">
           {facts.map(fact => (
@@ -566,6 +566,14 @@ export default function HomePage() {
               <p className="home-fact__desc">{fact.description}</p>
             </div>
           ))}
+        </div>
+        {/* 落地案例（脱敏）：定位「AI 编程落地」的真实业务证据（评审 P0-2） */}
+        <div className="home-case">
+          <span className="home-case__tag">CASE · AI 编程落地</span>
+          <h3 className="home-case__title">某城市轨交运营商 · 数字人智能体</h3>
+          <p className="home-case__desc">
+            基于 Dify 平台开发数字人智能体，集成 RAG 知识库，支撑运营知识问答与换乘推荐——真实业务场景中的端到端 AI 落地实践。
+          </p>
         </div>
         </Reveal>
       </section>
@@ -598,18 +606,7 @@ export default function HomePage() {
         <SectionHeader index="05" label="CONTACT" title="想聊点什么？" note="技术交流 · 开源协作 · 项目合作，欢迎联系。" />
         <Reveal>
         <div className="home-contact">
-          <div className="home-contact__qr">
-            <a href="/qq-group-qr.png" target="_blank" rel="noopener noreferrer" aria-label="放大 QQ 群二维码">
-              <img
-                src="/qq-group-qr.png"
-                alt="QQ 群「AI agent 学习交流」入群二维码"
-                width={148}
-                height={148}
-                loading="lazy"
-              />
-            </a>
-            <span className="home-contact__qr-label">QQ 群 · AI agent 学习交流</span>
-          </div>
+          {/* 转化优先级（评审 P0-1）：微信(标身份) > 邮箱实名 > GitHub > 平台 > QQ 群 */}
           <div className="home-contact__qr">
             <a href="/wechat-qr.png" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
               <img
@@ -620,12 +617,17 @@ export default function HomePage() {
                 loading="lazy"
               />
             </a>
-            <span className="home-contact__qr-label">微信 · 随风挥手</span>
+            <span className="home-contact__qr-label">微信 · Bigger蓝莓</span>
+            <span className="home-contact__qr-hint">加好友请备注来意</span>
           </div>
           <div className="home-contact__links">
+            <a href={`mailto:${personalInfo.email}`} className="home-contact__link home-contact__link--mail">
+              <Mail size={15} />
+              {personalInfo.email}
+            </a>
             <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-contact__link">
               <Github size={15} />
-              GitHub
+              GitHub @wxhou
             </a>
             {personalLinks.map(link => (
               <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="home-contact__link">
@@ -633,9 +635,9 @@ export default function HomePage() {
                 {link.name}
               </a>
             ))}
-            <a href={`mailto:${personalInfo.email}`} className="home-contact__link">
-              <Mail size={15} />
-              邮箱
+            <a href="/qq-group-qr.png" target="_blank" rel="noopener noreferrer" className="home-contact__link">
+              <ExternalLink size={15} />
+              QQ 群 · AI agent 学习交流
             </a>
           </div>
         </div>
