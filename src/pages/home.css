@@ -832,6 +832,13 @@
   flex-wrap: wrap;
 }
 
+/* 双二维码并排（微信 + QQ 群），间距紧于区块级 gap */
+.home-contact__qrs {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
 .home-contact__qr {
   display: flex;
   flex-direction: column;

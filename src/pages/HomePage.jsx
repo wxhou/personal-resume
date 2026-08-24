@@ -608,19 +608,34 @@ export default function HomePage() {
         <SectionHeader index="05" label="CONTACT" title="想聊点什么？" note="技术交流 · 开源协作 · 项目合作，欢迎联系。" />
         <Reveal>
         <div className="home-contact">
-          {/* 转化优先级（评审 P0-1）：微信(标身份) > 邮箱实名 > GitHub > 平台 > QQ 群 */}
-          <div className="home-contact__qr">
-            <a href="/wechat-qr.webp" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
-              <img
-                src="/wechat-qr.webp"
-                alt="微信二维码，扫一扫添加好友"
-                width={148}
-                height={148}
-                loading="lazy"
-              />
-            </a>
-            <span className="home-contact__qr-label">微信 · Bigger蓝莓</span>
-            <span className="home-contact__qr-hint">加好友请备注来意</span>
+          {/* 转化优先级：微信(标身份) / QQ 群直出二维码 > 邮箱实名 > GitHub > 平台 */}
+          <div className="home-contact__qrs">
+            <div className="home-contact__qr">
+              <a href="/wechat-qr.webp" target="_blank" rel="noopener noreferrer" aria-label="放大微信二维码">
+                <img
+                  src="/wechat-qr.webp"
+                  alt="微信二维码，扫一扫添加好友"
+                  width={148}
+                  height={148}
+                  loading="lazy"
+                />
+              </a>
+              <span className="home-contact__qr-label">微信 · Bigger蓝莓</span>
+              <span className="home-contact__qr-hint">加好友请备注来意</span>
+            </div>
+            <div className="home-contact__qr">
+              <a href="/qq-group-qr.webp" target="_blank" rel="noopener noreferrer" aria-label="放大 QQ 群二维码">
+                <img
+                  src="/qq-group-qr.webp"
+                  alt="QQ 群二维码，扫码加入 AI agent 学习交流群"
+                  width={148}
+                  height={148}
+                  loading="lazy"
+                />
+              </a>
+              <span className="home-contact__qr-label">QQ 群 · AI agent 学习交流</span>
+              <span className="home-contact__qr-hint">扫码入群</span>
+            </div>
           </div>
           <div className="home-contact__links">
             <a href={`mailto:${personalInfo.email}`} className="home-contact__link home-contact__link--mail">
@@ -637,10 +652,6 @@ export default function HomePage() {
                 {link.name}
               </a>
             ))}
-            <a href="/qq-group-qr.webp" target="_blank" rel="noopener noreferrer" className="home-contact__link">
-              <ExternalLink size={15} />
-              QQ 群 · AI agent 学习交流
-            </a>
           </div>
         </div>
         </Reveal>
