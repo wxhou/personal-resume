@@ -1,6 +1,0 @@
-name = "wxhou-resume"
-main = "src/index.js"
-compatibility_date = "2025-08-01"
-
-# 上游 = Vercel production 部署（personal-resume 项目）
-# Worker 仅做反向代理，所有内容仍以 Vercel 为准；CORS / cookie 透传，路径透传
