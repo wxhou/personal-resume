@@ -1024,11 +1024,11 @@
 
 /* ─── 自定义光标（三层：dot + ring + canvas） ─── */
 
-/* hover 设备隐藏原生光标 */
+/* hover 设备隐藏原生光标 —— 仅粒子区（hero）生效，页面其余区域原生光标 */
 @media (hover: hover) and (pointer: fine) {
-  .home-page.fx-cursor,
-  .home-page.fx-cursor a,
-  .home-page.fx-cursor button {
+  .home-hero,
+  .home-hero a,
+  .home-hero button {
     cursor: none;
   }
 }

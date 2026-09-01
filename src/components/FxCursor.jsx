@@ -172,6 +172,21 @@ export default function FxCursor() {
       lastActiveRef.current = performance.now()
       ensureRef.current?.()
 
+      // 作用域：自定义光标仅在粒子区（hero）生效，其余区域原生光标
+      const inHero = !!(e.target.closest?.('.home-hero'))
+      if (!inHero) {
+        if (visibleRef.current) {
+          visibleRef.current = false
+          dot.style.opacity = '0'
+          ring.style.opacity = '0'
+        }
+        if (hotRef.current) {
+          hotRef.current = false
+          ring.classList.remove('hot')
+        }
+        return // 拖尾粒子不再新增，存量自然衰减
+      }
+
       // dot 硬跟随
       dot.style.transform = `translate(${x - 3.5}px, ${y - 3.5}px)`
 
