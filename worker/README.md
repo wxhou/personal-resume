@@ -1,26 +1,29 @@
-# wxhou-resume Cloudflare Worker
+# wxhou-resume Cloudflare Worker（静态资产托管）
 
-反向代理：把 Cloudflare Worker 入口透传到 Vercel 生产部署。
+站点直接托管在 Cloudflare Workers 静态资产上，**无 Vercel、无代理层**。
 
 **生产 URL：** https://wxhou-resume.wxhou.workers.dev
 
-## 工作原理
-
-- 上游：`https://personal-resume-five-orcin.vercel.app`（Vercel 项目 `personal-resume` 的自动部署 URL，可在 Vercel Dashboard 变更）
-- 所有 path / query / method / body / headers 透传，仅附加 `x-proxied-by: cloudflare-worker` 调试头
-
-## 部署命令
+## 部署
 
 ```bash
-cd worker
-npm install
-npx wrangler deploy --autoconfig=false --name=wxhou-resume worker/src/index.js
+# 仓库根目录一条命令：build + deploy
+npm run deploy:cf
 ```
 
-> 注：本项目父目录是 Vite 工程，wrangler v4 会自动检测并报 Vite 版本不兼容——必须显式关闭 autoconfig 并指定入口文件。`--autoconfig=false` 跳过框架检测，CLI 参数强制覆盖项目名。首次部署前需 `wrangler login`（OAuth），或设置 `CLOUDFLARE_API_TOKEN`（需 Workers Scripts:Edit 权限）。
+（等价于 `npm run build && cd worker && npx wrangler deploy`）
 
-部署完成 → workers.dev URL 已落地为仓库 `JSON-LD.url` + `og:url` + `og:image` + `sitemap.xml` + `robots.txt` 的唯一权威域名（`wxhou.vercel.app` 占位已彻底替换）。
+首次部署前需 `npx wrangler login`（OAuth）。注意：若 shell 里有
+`CLOUDFLARE_API_TOKEN` 环境变量，其权限不足时会覆盖 OAuth 凭据，
+临时 `env -u CLOUDFLARE_API_TOKEN npx wrangler deploy` 可绕开。
 
-## 切换上游
+## 想恢复 git push 自动部署？
 
-Vercel 自动部署 URL 可能随重新部署变化，修改 `src/index.js` 里的 `UPSTREAM` 常量后重跑部署命令即可，无需重命名 Worker。
+在 Cloudflare Dashboard → Workers & Pages →wxhou-resume → Settings
+连上 GitHub 仓库即可（Workers Builds CI，构建命令 `npm run build`，
+输出目录 `dist`）。
+
+## 历史
+
+- 2026-08-24 起脱离 Vercel：本 Worker 曾是反代 Vercel 的透传层
+  （`src/index.js` 已删），现 dist 直接挂为静态资产，URL 不变。
