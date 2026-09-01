@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wxhou-resume.wxhou.workers.dev/sitemap.xml
+Sitemap: https://wxhou.pages.dev/sitemap.xml

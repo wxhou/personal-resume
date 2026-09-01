@@ -326,11 +326,11 @@ export default function HomePage() {
         <meta name="description" content="Bigger蓝莓的个人主页：AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
         <meta property="og:title" content="Bigger蓝莓 - AI应用工程师" />
         <meta property="og:description" content="AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
-        <meta property="og:image" content="https://wxhou-resume.wxhou.workers.dev/og-image.png" />
+        <meta property="og:image" content="https://wxhou.pages.dev/og-image.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:type" content="profile" />
-        <meta property="og:url" content="https://wxhou-resume.wxhou.workers.dev/" />
+        <meta property="og:url" content="https://wxhou.pages.dev/" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 

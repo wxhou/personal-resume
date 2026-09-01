@@ -1,9 +1,0 @@
-{
-  // 静态资产型 Worker：无脚本逻辑，dist 原样托管
-  // 部署前先在仓库根目录 npm run build 生成 dist
-  "name": "wxhou-resume",
-  "compatibility_date": "2026-08-20",
-  "assets": {
-    "directory": "../dist"
-  }
-}
