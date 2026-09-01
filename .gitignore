@@ -61,3 +61,7 @@ openspec/
 
 # 本地测试基建（用户决定不入库）
 playwright.config.ts
+
+# 字体子集化产物（scripts/subset-fonts.js 生成，源字体入库、产物不入库）
+src/assets/fonts/*.woff2
+src/assets/fonts/index.css

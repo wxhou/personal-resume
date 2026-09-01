@@ -212,10 +212,12 @@ export default function HeroSphere({ dark = false }) {
     const parent = canvas.parentElement
     const ro = parent ? new ResizeObserver(() => resize()) : null
     if (ro && parent) ro.observe(parent)
-    const resizeTimer = setInterval(() => resize(), 500)
 
-    // ── 动画循环 ─────────────────────────────────────────────
+    // ── 动画循环（启停由 IO / visibilitychange / contextlost/restored 三源驱动）──
     let raf = 0
+    let running = false
+    let inViewport = true
+    let contextLost = false
 
     const loop = (now) => {
       raf = requestAnimationFrame(loop)
@@ -261,18 +263,51 @@ export default function HeroSphere({ dark = false }) {
       renderer.render(scene, camera)
     }
 
-    requestAnimationFrame((now) => {
-      clockPrev.v = now
-      resize()
-      loop(now)
-    })
+    // 启停控制：resume 时重置时钟基线，防止暂停期累积出 dt 跳变
+    const pause = () => {
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
+      running = false
+    }
+    const ensureRunning = () => {
+      if (running || !inViewport || document.hidden || contextLost) return
+      clockPrev.v = performance.now()
+      raf = requestAnimationFrame(loop)
+      running = true
+    }
 
-    // ── webglcontextlost 兜底 ────────────────────────────────
+    // hero 画布离屏（200px 缓冲防快速滚动闪烁）即停渲染
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting
+        inViewport ? ensureRunning() : pause()
+      },
+      { rootMargin: '200px', threshold: 0 }
+    )
+    if (parent) io.observe(parent)
+
+    const onVisibility = () => {
+      document.hidden ? pause() : ensureRunning()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    resize()
+    ensureRunning()
+
+    // ── webglcontextlost/restored：丢失安全停止，恢复自动重启 ──
     const onLost = (e) => {
       e.preventDefault()
-      cancelAnimationFrame(raf)
+      contextLost = true
+      pause()
+    }
+    const onRestored = () => {
+      contextLost = false
+      ensureRunning()
     }
     canvas.addEventListener('webglcontextlost', onLost)
+    canvas.addEventListener('webglcontextrestored', onRestored)
 
     // ── Dev 调试 hook ────────────────────────────────────────
     if (import.meta.env?.DEV) {
@@ -291,11 +326,13 @@ export default function HeroSphere({ dark = false }) {
 
     // ── 清理 ─────────────────────────────────────────────────
     return () => {
-      cancelAnimationFrame(raf)
-      clearInterval(resizeTimer)
+      pause()
       if (ro) ro.disconnect()
+      if (parent) io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', onResize)
       canvas.removeEventListener('webglcontextlost', onLost)
+      canvas.removeEventListener('webglcontextrestored', onRestored)
       if (!noHover) {
         window.removeEventListener('pointermove', onPointerMove)
       }

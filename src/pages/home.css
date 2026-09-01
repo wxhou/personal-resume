@@ -246,7 +246,7 @@
 .home-hero__subtitle {
   font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
   font-size: var(--fs-h3);
-  font-weight: 500;
+  font-weight: 400; /* 实际渲染面（原声明 500 无对应字体文件，浏览器落到 400）；声明改为诚实值 */
   line-height: var(--lh-heading);
   color: var(--text-strong);
   margin: 0 0 14px;

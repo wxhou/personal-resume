@@ -31,6 +31,8 @@ export default function FxCursor() {
   const posRef = useRef({ x: 0, y: 0 })
   const visibleRef = useRef(false)
   const hotRef = useRef(false)
+  const lastActiveRef = useRef(0)
+  const ensureRef = useRef(null) // 事件层调用：恢复动画循环
 
   // ── Canvas 2D 拖尾绘制 ──────────────────────────────────
   const drawTrail = useCallback(() => {
@@ -94,9 +96,29 @@ export default function FxCursor() {
     let ringX = 0, ringY = 0
     const RING_LERP = 0.15 // 越小越有弹性延迟
 
-    const loop = () => {
+    // 空闲停帧：指针静默 >200ms 且无存活粒子 → 停 RAF（pointermove/click 重启）
+    const pause = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = 0
+      }
+    }
+    const ensureRunning = () => {
+      if (rafRef.current) return
+      lastActiveRef.current = performance.now()
+      rafRef.current = requestAnimationFrame(loop)
+    }
+    ensureRef.current = ensureRunning
+
+    const loop = (now) => {
       rafRef.current = requestAnimationFrame(loop)
       if (document.hidden) return
+
+      if (now - lastActiveRef.current > 200 && pointsRef.current.length === 0 && burstsRef.current.length === 0) {
+        pause()
+        drawTrail() // 停帧前清屏
+        return
+      }
 
       // 衰减粒子
       const pts = pointsRef.current
@@ -124,10 +146,11 @@ export default function FxCursor() {
       ringY += (y - ringY) * RING_LERP
       ring.style.transform = `translate(${ringX - 17}px, ${ringY - 17}px)`
     }
-    rafRef.current = requestAnimationFrame(loop)
+    ensureRunning()
 
     return () => {
-      cancelAnimationFrame(rafRef.current)
+      pause()
+      ensureRef.current = null
       window.removeEventListener('resize', resize)
     }
   }, [drawTrail])
@@ -146,6 +169,8 @@ export default function FxCursor() {
       const x = e.clientX
       const y = e.clientY
       posRef.current = { x, y }
+      lastActiveRef.current = performance.now()
+      ensureRef.current?.()
 
       // dot 硬跟随
       dot.style.transform = `translate(${x - 3.5}px, ${y - 3.5}px)`
@@ -186,10 +211,14 @@ export default function FxCursor() {
       visibleRef.current = true
       dot.style.opacity = '1'
       ring.style.opacity = '1'
+      lastActiveRef.current = performance.now()
+      ensureRef.current?.()
     }
 
     // 点击迸发：~10 个 accent 色粒子从点击点向外飞散
     const onClick = (e) => {
+      lastActiveRef.current = performance.now()
+      ensureRef.current?.()
       const bursts = burstsRef.current
       for (let i = 0; i < BURST_COUNT; i++) {
         const ang = Math.random() * Math.PI * 2
