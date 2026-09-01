@@ -101,3 +101,32 @@
   color: #C97A66;
   background: rgba(201, 122, 102, 0.1);
 }
+
+/* ─── 移动端：收缩间距防折行（无汉堡菜单，四链接极短可全保留） ─── */
+@media (max-width: 640px) {
+  .site-nav {
+    padding: 0 16px;
+  }
+
+  .site-nav__brand {
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .site-nav__links {
+    gap: 0;
+  }
+
+  .site-nav__link {
+    padding: 6px 7px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .site-nav__theme-toggle {
+    margin-left: 2px;
+    width: 30px;
+    height: 30px;
+  }
+}
