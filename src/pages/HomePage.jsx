@@ -210,20 +210,27 @@ export default function HomePage() {
       const saved = localStorage.getItem(THEME_STORAGE_KEY)
       if (saved === 'dark' || saved === 'light') return saved
     } catch { /* 忽略 */ }
-    return 'dark' // 默认暗色（站点身份，不随系统偏好）
+    // 兜底：跟随系统偏好（与 index.html 内联脚本一致）
+    if (typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: light)').matches) return 'light'
+    return 'dark'
   })
 
   // SiteNav 的 toggle 按钮经自定义事件桥接（两者无父子数据流）
   useEffect(() => {
-    const onToggle = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))
+    const onToggle = () => setTheme(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark'
+      // 仅用户显式切换才写记忆——不能在挂载时把默认值固化，
+      // 否则「无记忆跟随系统」在第二次访问就失效
+      try { localStorage.setItem(THEME_STORAGE_KEY, next) } catch { /* 隐私模式等场景忽略 */ }
+      return next
+    })
     window.addEventListener(HOME_THEME_TOGGLE_EVENT, onToggle)
     return () => window.removeEventListener(HOME_THEME_TOGGLE_EVENT, onToggle)
   }, [])
 
-  // theme 变化：同步 <html> data-theme + localStorage 持久化
+  // theme 变化：同步 <html> data-theme（记忆已由 toggle 时机写入）
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    try { localStorage.setItem(THEME_STORAGE_KEY, theme) } catch { /* 隐私模式等场景忽略 */ }
   }, [theme])
 
   // 首页强制暖底（亮 #FBF7F1 / 暗 #211D18），离开首页恢复
