@@ -58,3 +58,6 @@ AGENTS.md
 CLAUDE.md
 tests/
 openspec/
+
+# 本地测试基建（用户决定不入库）
+playwright.config.ts
