@@ -537,7 +537,7 @@ export default function HomePage() {
 
       {/* ─── 成果 ─── */}
       <section id="proof" className="home-section">
-        <SectionHeader index="02" label="PROOF" title="看得见的成果" note="GitHub 仓库、star 数与博客园记录。" />
+        <SectionHeader index="02" label="PROOF" title="看得见的成果" note="数字不会说谎，但会挑着说——star 最多的那个工具，我自己天天在用。" />
         <Reveal>
         <div className="home-proof">
           <a className="home-proof__card" href={personalInfo.github} target="_blank" rel="noopener noreferrer">
@@ -663,6 +663,7 @@ export default function HomePage() {
       {/* ─── Footer ─── */}
       <footer className="home-footer">
         <span>{heroStatement.headline} · {personalInfo.name}</span>
+        <span className="home-footer__note" title="博客园最近一篇：2022-10">博客 2022 年后停更了——别催，在想大的</span>
         <span>© 2026 {personalInfo.name} · BUILT WITH AI, SHIPPED BY HUMAN</span>
       </footer>
     </div>
