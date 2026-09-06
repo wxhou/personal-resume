@@ -981,22 +981,23 @@
 
 /* ─── 暗色主题（暖深褐，与亮色暖色语言同源；data-theme 挂 <html>，FOUC 脚本首帧前写入） ─── */
 :root[data-theme="dark"] .home-page {
-  --bg-page: #211D18;
-  --bg-soft: #2A251F;
-  --surface: #2E2924;
-  --surface-border: rgba(240, 234, 226, 0.08);
-  --surface-border-strong: rgba(240, 234, 226, 0.16);
-  --text-strong: #F0EAE2;
-  --text-base: #B8AFA3;
-  --text-soft: #8F867A;
-  /* accent 提亮：#B86B5D 在 #211D18 上对比 ~3.2:1 不达标，提亮后 ~4.6:1 过 AA */
-  --accent: #C97A66;
-  --accent-hover: #D48973;
-  --accent-soft: rgba(201, 122, 102, 0.14);
+  /* 冷调深青灰系（hue ~220°）：暖棕暗化后发闷发泥，冷底让赭红强调更跳、卡片层次可辨 */
+  --bg-page: #16181D;
+  --bg-soft: #1C1F26;
+  --surface: #232833;
+  --surface-border: rgba(232, 236, 244, 0.08);
+  --surface-border-strong: rgba(232, 236, 244, 0.17);
+  --text-strong: #E9ECF1;
+  --text-base: #A3ABB8;
+  --text-soft: #707A88;
+  /* accent 在冷底上同色相略提亮：#C97A66 → #CE8574，对比 ~5:1 过 AA */
+  --accent: #CE8574;
+  --accent-hover: #DB9787;
+  --accent-soft: rgba(206, 133, 116, 0.14);
 
   background-color: var(--bg-page);
   /* 点阵纹理换浅色点，α 提高至暗底可辨（亮色版是暖深色点 0.06） */
-  background-image: radial-gradient(rgba(240, 234, 226, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(232, 236, 244, 0.08) 1px, transparent 1px);
 }
 
 /* 暗色氛围光：深赭红椭圆光晕透过粒子云提供纵深（纯 CSS 零 DOM，不拦截交互） */

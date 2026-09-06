@@ -41,9 +41,9 @@ const PALETTES = {
     fogDensity: 0.038, // 减弱雾洗，远处粒子不再融进米底
   },
   dark: {
-    sage: { r: 0.588, g: 0.675, b: 0.565 },  // #96AC90
-    brass: { r: 0.831, g: 0.537, b: 0.451 }, // #D48973
-    size: 0.06,
+    sage: { r: 0.502, g: 0.573, b: 0.616 },  // #80929D 冷青灰（对新底 #16181D，配合 additive 提亮星云感）
+    brass: { r: 0.784, g: 0.502, b: 0.427 }, // #C8806D 赭红（与新 accent #CE8574 同族）
+    size: 0.05, // 收小一档：暗底 additive 下原 0.06 爆成雪花噪点
     fogDensity: 0.05,
   },
 }
@@ -143,6 +143,7 @@ export default function HeroSphere({ dark = false }) {
       if (material) {
         material.blending = isDark ? AdditiveBlending : NormalBlending
         material.size = p.size
+        material.opacity = isDark ? 0.72 : 0.92 // 暗底 additive 叠加亮，降透明度防过曝噪点
       }
       if (scene.fog) scene.fog.density = p.fogDensity
     }
@@ -348,7 +349,7 @@ export default function HeroSphere({ dark = false }) {
   useEffect(() => {
     const s = sceneRef.current
     if (!s) return
-    s.fog.color.set(dark ? 0x211d18 : 0xfbf7f1)
+    s.fog.color.set(dark ? 0x16181d : 0xfbf7f1)
   }, [dark])
 
   // 星云切换（同构 layout effect：commit 后、绘制前执行，防暗色首帧闪现亮板）

@@ -71,35 +71,35 @@
 
 /* ─── 暗色导航：仅当首页在渲染时生效（:has 限域，/resume 不受 data-theme 影响） ─── */
 :root[data-theme="dark"]:has(.home-page) .site-nav {
-  background: linear-gradient(rgba(33, 29, 24, 0.92), rgba(33, 29, 24, 0));
-  color: #F0EAE2;
+  background: linear-gradient(rgba(22, 24, 29, 0.92), rgba(22, 24, 29, 0));
+  color: #E9ECF1;
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__brand {
-  color: #F0EAE2;
+  color: #E9ECF1;
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__link {
-  color: #B8AFA3;
+  color: #A3ABB8;
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__link:hover {
-  color: #C97A66;
-  background: rgba(201, 122, 102, 0.1);
+  color: #CE8574;
+  background: rgba(206, 133, 116, 0.1);
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__link--active {
-  color: #C97A66;
-  background: rgba(201, 122, 102, 0.12);
+  color: #CE8574;
+  background: rgba(206, 133, 116, 0.12);
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__theme-toggle {
-  color: #B8AFA3;
+  color: #A3ABB8;
 }
 
 :root[data-theme="dark"]:has(.home-page) .site-nav__theme-toggle:hover {
-  color: #C97A66;
-  background: rgba(201, 122, 102, 0.1);
+  color: #CE8574;
+  background: rgba(206, 133, 116, 0.1);
 }
 
 /* ─── 移动端：收缩间距防折行（无汉堡菜单，四链接极短可全保留） ─── */
