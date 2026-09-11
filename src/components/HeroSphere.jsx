@@ -6,55 +6,75 @@ import {
   BufferGeometry,
   BufferAttribute,
   Points,
-  PointsMaterial,
-  Mesh,
-  TorusGeometry,
-  MeshBasicMaterial,
-  FogExp2,
+  ShaderMaterial,
   AdditiveBlending,
   NormalBlending,
+  Color,
 } from 'three'
 
 /**
- * HeroSphere — 三形态循环 morph 粒子系统（参考 jingjinglearns.cc 风格）
+ * HeroSphere — 银河粒子系统（tmp/galaxy-demo.html 原型移植）
  *
- * 粒子在三种形态间循环 morph（叙事主线）：
- *   1. 散乱数据云 chaos   →   2. 结构化矩阵 matrix   →   3. 神经网络球 brain
- * 每 ~6.4s 切换（hold 4.2s + morph 2.2s 缓动），循环往复。
+ * 四形态循环 morph（叙事主线）：
+ *   1. 散乱数据云 chaos   →   2. 结构化矩阵 matrix   →   3. 神经网络球 brain   →   4. 星河 galaxy
+ * 初始停在星河（首屏即银河），hold 4.2s + morph 2.2s 缓动，循环往复。
  *
- * 相机鼠标视差（场景随鼠标轻摆，替代 raycaster repel）。
- * 细环 TorusGeometry 缓慢自转，克制两色（sage + brass），慢节奏。
+ * 渲染：ShaderMaterial（软圆核 + 幂律亮度 seed^3.5 + twinkle + 亮星十字光芒）
+ * + 径向色温（银心暖 → 外缘冷）+ 远景星场（r26-40 球壳，深度视差的「远」）。
+ * 亮色主题 normal blending（米底墨色星图）；暗色 additive 星云，spike 仅暗色。
  *
  * 树摇命名导入（不要 import * as THREE）。仅客户端 useEffect 内初始化。
  */
 
-// brass 0xC2705B，每 6 个粒子 1 个 brass（sage 见 sageColor 归一化对象）
-const BRASS = 0xc2705b
+const RADIUS = 7.5 // 银河半径（世界单位）
+const GALAXY_INDEX = 3 // shapes 中星河的下标 = 初始展示形态
 
-// 粒子双主题参数：亮色需深化色板/加大尺寸/减弱雾以抵消米底低对比；
-// 暗色 additive+提亮呈星云（浅底下 additive 会过曝不可见，故仅暗色启用）
+// 双主题银河：色温插值两端（inside=银心，outside=旋臂外缘）+ 远景星
+// 暗色 additive 星云（软核光晕叠加发光）；亮色「墨色星图」——纸上天文图：
+// 无光晕浓墨实点（coreExp 小 = 点缘锐利），密度堆出银心，最亮一撮星手染赭红。
+// 亮色沿用暗色的软光晕渲染会读作「纸面污渍」——发光模型只属于暗底
 const PALETTES = {
   light: {
-    sage: { r: 0.392, g: 0.502, b: 0.361 },  // #64805C 深绿（对米底 4.1:1，原 #7E9479 仅 3.1:1）
-    brass: { r: 0.627, g: 0.322, b: 0.220 }, // #A05238 深红棕（5.2:1，原 #C2705B 仅 3.4:1）
-    size: 0.075, // 原 0.06 在米底上仅 2-3px 几乎不可辨
-    fogDensity: 0.038, // 减弱雾洗，远处粒子不再融进米底
+    inside: new Color(0x3a352d),  // 银心 浓墨
+    outside: new Color(0x7a7164), // 旋臂外 淡墨（越远越淡，印刷褪色感）
+    star: new Color(0x4a443b),    // 远景星 墨灰
+    accent: new Color(0xa05238),  // 亮星 手染赭红（站点强调色同族）
+    additive: false,
+    opacity: 1.0,   // 版画墨是实心的：0.95 的空隙会让银心发飘（design D3）
+    pointScale: 0.9,
+    coreExp: 1.6,   // 小指数 = 实心墨点；暗色 3.0 = 软光晕
+    halo: 0.08,     // 高斯光晕强度：纸上不发光，压到近零
+    sizeFloor: 2.8, // 暗星下限抬一档，银心密度感增强（design D3）
+    twinkle: 0.55,  // 闪烁幅度收敛（纸面闪烁读作噪点抖动）
+    accentMix: 1,
   },
   dark: {
-    sage: { r: 0.502, g: 0.573, b: 0.616 },  // #80929D 冷青灰（对新底 #16181D，配合 additive 提亮星云感）
-    brass: { r: 0.784, g: 0.502, b: 0.427 }, // #C8806D 赭红（与新 accent #CE8574 同族）
-    size: 0.05, // 收小一档：暗底 additive 下原 0.06 爆成雪花噪点
-    fogDensity: 0.05,
+    inside: new Color(0xc8806d),  // 银心 赭红（与新 accent #CE8574 同族）
+    outside: new Color(0x80929d), // 旋臂外 冷青灰
+    star: new Color(0xa9b4c4),    // 远景星 冷白
+    accent: new Color(0xc8806d),
+    additive: true,
+    opacity: 0.72,
+    pointScale: 1.15,
+    coreExp: 3.0,
+    halo: 0.35,
+    sizeFloor: 1.4,
+    twinkle: 1,
+    accentMix: 0,
   },
 }
 
 // 同构安全的 layout effect（SSG 预渲染阶段退化为 useEffect，消除 SSR warning）
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
+// Box-Muller 高斯随机（银心密度 / 尘埃散布用）
+function gauss() {
+  return Math.sqrt(-2 * Math.log(Math.random() || 1e-9)) * Math.cos(Math.PI * 2 * Math.random())
+}
+
 export default function HeroSphere({ dark = false }) {
   const canvasRef = useRef(null)
-  const sceneRef = useRef(null) // fog 联动用：dark prop 变化时改雾色不重建场景
-  const applyThemeRef = useRef(null) // 主题参数应用（blending/色板/尺寸/雾），由 init 注入
+  const applyThemeRef = useRef(null) // 主题参数应用（blending/色板/spike），由 init 注入
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -70,17 +90,16 @@ export default function HeroSphere({ dark = false }) {
 
     // ── Scene + Camera + Renderer ───────────────────────────
     const scene = new Scene()
-    scene.fog = new FogExp2(0xfbf7f1, 0.05) // 淡雾融入米底
-    sceneRef.current = scene
 
-    const camera = new PerspectiveCamera(60, 1, 0.1, 100)
-    camera.position.set(0, 0, isMobile ? 16 : 12)
+    // 银盘视角：相机抬升 + 俯角，站低处仰望银盘（demo 验证构图）
+    const camera = new PerspectiveCamera(58, 1, 0.1, 120)
+    camera.position.set(0, 2.2, isMobile ? 17 : 11.5)
     camera.lookAt(0, 0, 0)
 
     const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
     renderer.setClearColor(0x000000, 0)
 
-    // ── 三种目标形态（预计算，运行时插值） ──────────────────
+    // ── 四种目标形态（预计算，运行时插值） ──────────────────
     const makeChaos = () => {
       // 散乱数据云（起点：原始数据）
       const arr = new Float32Array(COUNT * 3)
@@ -120,61 +139,242 @@ export default function HeroSphere({ dark = false }) {
       }
       return arr
     }
-    const shapes = [makeChaos(), makeMatrix(), makeBrain()]
-    const stageNames = ['原始数据', '数据工程', 'AI 产品']
+    const makeGalaxy = () => {
+      // 对数螺旋银河：中心高斯聚拢 + 4 旋臂 + 尘埃带散布
+      const arr = new Float32Array(COUNT * 3)
+      const ARMS = 4
+      for (let i = 0; i < COUNT; i++) {
+        const r = Math.pow(Math.random(), 2.2) * RADIUS
+        const arm = ((i % ARMS) / ARMS) * Math.PI * 2
+        const spin = r * 0.85
+        const spread = (Math.random() - 0.5) ** 3 * (r + 0.3) * 0.5 + gauss() * 0.35
+        const theta = arm + spin + spread * 0.6
+        arr[i * 3] = Math.cos(theta) * r + gauss() * 0.4
+        arr[i * 3 + 1] = gauss() * 0.5 * (1 - r / RADIUS) // 银盘薄：越靠外缘越扁
+        arr[i * 3 + 2] = Math.sin(theta) * r + gauss() * 0.4
+      }
+      return arr
+    }
+    const shapes = [makeChaos(), makeMatrix(), makeBrain(), makeGalaxy()]
+    const stageNames = ['原始数据', '数据工程', 'AI 产品', '星河']
 
-    // ── 粒子系统 ─────────────────────────────────────────────
+    // 每星随机种子（幂律亮度 + twinkle 相位）+ 色温 t（0=银心暖 → 1=外缘冷，按星河半径标定；
+    // 其余形态沿用此映射，warm/cool 随机混色已在 demo 验证）
+    const seeds = new Float32Array(COUNT)
+    const temps = new Float32Array(COUNT)
+    const galaxy = shapes[GALAXY_INDEX]
+    for (let i = 0; i < COUNT; i++) {
+      seeds[i] = Math.random()
+      const r = Math.hypot(galaxy[i * 3], galaxy[i * 3 + 2]) / RADIUS
+      temps[i] = Math.min(r + gauss() * 0.08, 1)
+    }
+
+    // ── 主 Points：ShaderMaterial（圆软核 + 幂律 size + twinkle + spike）──
     const geo = new BufferGeometry()
-    const positions = new Float32Array(shapes[0])
+    // 初始位置 = 星河形态（stage 初值 GALAXY_INDEX，首屏即银河）
+    const positions = new Float32Array(shapes[GALAXY_INDEX])
     geo.setAttribute('position', new BufferAttribute(positions, 3))
+    geo.setAttribute('aSeed', new BufferAttribute(seeds, 1))
+    geo.setAttribute('aTemp', new BufferAttribute(temps, 1))
     geo.setDrawRange(0, drawCount)
 
-    const colors = new Float32Array(COUNT * 3)
-    // 主题参数一体应用：色板 + blending + 尺寸 + 雾密度
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const uniforms = {
+      uTime: { value: 0 },
+      uPixelRatio: { value: dpr },
+      uScale: { value: window.innerHeight * 0.5 },
+      uInside: { value: new Color() },
+      uOutside: { value: new Color() },
+      uOpacity: { value: 0.92 },
+      uPointScale: { value: 1 },
+      uCoreExp: { value: 3.0 },
+      uHalo: { value: 0.35 },
+      uSizeFloor: { value: 1.4 },
+      uTwinkleAmp: { value: 1 },
+      uAccent: { value: new Color() },
+      uAccentMix: { value: 0 },
+      uSpike: { value: 0 },
+      uTwinkle: { value: 1 },
+    }
+
+    const material = new ShaderMaterial({
+      uniforms,
+      transparent: true,
+      depthWrite: false,
+      blending: NormalBlending,
+      vertexShader: /* glsl */ `
+        attribute float aSeed;
+        attribute float aTemp;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uScale;
+        uniform float uPointScale;
+        uniform float uSizeFloor;
+        uniform float uTwinkle;
+        uniform float uTwinkleAmp;
+        varying float vBright;
+        varying float vTemp;
+        varying float vTwinkle;
+        varying float vIsBright;
+
+        // 幂律亮度：seed^k → 少数极亮、多数极暗
+        void main() {
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mvPosition;
+          vBright = pow(aSeed, 3.5);           // 幂律分布核心
+          vTemp = aTemp;
+          vTwinkle = 0.75 + uTwinkleAmp * 0.25 * sin(uTime * (1.0 + aSeed * 2.0) + aSeed * 17.0);
+          vIsBright = step(0.965, aSeed);      // 前 3.5% 是亮星
+          float tw = mix(1.0, vTwinkle, uTwinkle);
+          float base = uSizeFloor + vBright * 22.0;
+          gl_PointSize = base * uPointScale * tw * uScale * uPixelRatio * 0.01 / max(-mvPosition.z, 0.1);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform vec3 uInside;
+        uniform vec3 uOutside;
+        uniform vec3 uAccent;
+        uniform float uAccentMix;
+        uniform float uOpacity;
+        uniform float uCoreExp;
+        uniform float uHalo;
+        uniform float uSpike;
+        uniform float uTwinkle;
+        varying float vBright;
+        varying float vTemp;
+        varying float vTwinkle;
+        varying float vIsBright;
+
+        void main() {
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          if (d > 1.0) discard;
+          // 软圆核：coreExp 衰减（暗色 3.0=光晕 / 亮色 1.6=实心墨点）+ 高斯光晕
+          float core = pow(max(0.0, 1.0 - d), uCoreExp) + exp(-d * d * 6.0) * uHalo;
+          // diffraction spike：仅亮星（十字光芒），仅暗色主题（亮色下是纯噪）
+          float spike = 0.0;
+          if (vIsBright > 0.5 && uSpike > 0.5) {
+            spike = (exp(-abs(gl_PointCoord.x - 0.5) * 26.0) + exp(-abs(gl_PointCoord.y - 0.5) * 26.0))
+                  * exp(-d * 3.0) * 0.7;
+          }
+          // 亮色星图：accent 染色曲线压平（pow 0.6）——中亮星也吃到赭红，强染色族群约翻倍，
+          // 构成亮色独有的「手染亮星」焦点；暗色 accentMix=0 天然隔离。spike 阈值独立（仅暗色）
+          vec3 col = mix(uInside, uOutside, vTemp);
+          col = mix(col, uAccent, uAccentMix * pow(vBright, 0.6));
+          float alpha = uOpacity * (core + spike) * mix(1.0, vTwinkle, uTwinkle * 0.6);
+          gl_FragColor = vec4(col, alpha);
+          #include <colorspace_fragment>
+        }
+      `,
+    })
+
+    // 主题参数一体应用：色板 + blending + 亮度/spike（星场联动）
     const applyTheme = (isDark) => {
       const p = isDark ? PALETTES.dark : PALETTES.light
-      for (let i = 0; i < COUNT; i++) {
-        const c = i % 6 === 0 ? p.brass : p.sage
-        colors[i * 3] = c.r
-        colors[i * 3 + 1] = c.g
-        colors[i * 3 + 2] = c.b
-      }
-      geo.attributes.color && (geo.attributes.color.needsUpdate = true) // 颜色生效的必要条件
       if (material) {
-        material.blending = isDark ? AdditiveBlending : NormalBlending
-        material.size = p.size
-        material.opacity = isDark ? 0.72 : 0.92 // 暗底 additive 叠加亮，降透明度防过曝噪点
+        material.blending = p.additive ? AdditiveBlending : NormalBlending
+        material.needsUpdate = true
       }
-      if (scene.fog) scene.fog.density = p.fogDensity
+      if (uniforms) {
+        uniforms.uInside.value.copy(p.inside)
+        uniforms.uOutside.value.copy(p.outside)
+        uniforms.uOpacity.value = p.opacity
+        uniforms.uPointScale.value = p.pointScale
+        uniforms.uCoreExp.value = p.coreExp
+        uniforms.uHalo.value = p.halo
+        uniforms.uSizeFloor.value = p.sizeFloor
+        uniforms.uTwinkleAmp.value = p.twinkle
+        uniforms.uAccent.value.copy(p.accent)
+        uniforms.uAccentMix.value = p.accentMix
+        uniforms.uSpike.value = isDark ? 1 : 0
+      }
+      if (starMat) {
+        starMat.blending = p.additive ? AdditiveBlending : NormalBlending
+        starMat.needsUpdate = true
+        starUniforms.uColor.value.copy(p.star)
+        starUniforms.uOpacity.value = isDark ? 0.55 : 0.8 // 亮色星图：远景星也要清晰可辨
+        starUniforms.uSizeFloor.value = isDark ? 0.8 : 1.6 // 纸上 1px 淡点不可见
+      }
     }
-    geo.setAttribute('color', new BufferAttribute(colors, 3))
 
-    const material = new PointsMaterial({
-      size: PALETTES[dark ? 'dark' : 'light'].size,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.92,
-      depthWrite: false,
-    })
-    applyTheme(dark) // init 即按当前主题初始化，防暗色访客首帧闪现亮板
-    applyThemeRef.current = applyTheme
     const points = new Points(geo, material)
+    points.rotation.x = 0.42 // 银盘视角倾斜
+    points.frustumCulled = false // morph 中包围球失效，禁用剔除
     scene.add(points)
 
-    // ── 细环装饰 ─────────────────────────────────────────────
-    const ringMat = new MeshBasicMaterial({ color: BRASS, transparent: true, opacity: 0.3 })
-    const ring = new Mesh(new TorusGeometry(7.6, 0.015, 8, 160), ringMat)
-    ring.rotation.x = Math.PI / 2.4
-    scene.add(ring)
+    // ── 远景星场：静态球壳（深度视差的「远」）────────────────
+    const STAR_COUNT = isMobile ? 500 : 900
+    const starGeo = new BufferGeometry()
+    const starPos = new Float32Array(STAR_COUNT * 3)
+    const starSeed = new Float32Array(STAR_COUNT)
+    for (let i = 0; i < STAR_COUNT; i++) {
+      // 远球壳（r 26-40），避免与银盘重叠
+      const rr = 26 + Math.random() * 14
+      const t = Math.acos(2 * Math.random() - 1)
+      const ph = Math.random() * Math.PI * 2
+      starPos[i * 3] = rr * Math.sin(t) * Math.cos(ph)
+      starPos[i * 3 + 1] = rr * Math.sin(t) * Math.sin(ph)
+      starPos[i * 3 + 2] = rr * Math.cos(t)
+      starSeed[i] = Math.random()
+    }
+    starGeo.setAttribute('position', new BufferAttribute(starPos, 3))
+    starGeo.setAttribute('aSeed', new BufferAttribute(starSeed, 1))
 
-    // ── morph 调度 ───────────────────────────────────────────
-    let stage = 0
-    let next = 1
+    const starUniforms = {
+      uTime: uniforms.uTime, // 共享引用：主循环只更新一次
+      uPixelRatio: uniforms.uPixelRatio,
+      uScale: uniforms.uScale,
+      uTwinkle: uniforms.uTwinkle,
+      uColor: { value: new Color() },
+      uOpacity: { value: 0.55 },
+      uSizeFloor: { value: 0.8 },
+    }
+    const starMat = new ShaderMaterial({
+      uniforms: starUniforms,
+      transparent: true,
+      depthWrite: false,
+      blending: NormalBlending,
+      vertexShader: /* glsl */ `
+        attribute float aSeed;
+        uniform float uTime, uPixelRatio, uScale, uTwinkle, uSizeFloor;
+        varying float vA;
+        void main() {
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mv;
+          float b = pow(aSeed, 2.2);
+          vA = 0.5 + 0.5 * sin(uTime * (0.6 + aSeed) + aSeed * 29.0);
+          float tw = mix(1.0, 0.7 + 0.3 * vA, uTwinkle);
+          gl_PointSize = (uSizeFloor + b * 5.0) * tw * uScale * uPixelRatio * 0.008 / max(-mv.z, 0.1);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform vec3 uColor;
+        uniform float uOpacity;
+        varying float vA;
+        void main() {
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          if (d > 1.0) discard;
+          float core = pow(max(0.0, 1.0 - d), 2.5);
+          gl_FragColor = vec4(uColor, uOpacity * core);
+          #include <colorspace_fragment>
+        }
+      `,
+    })
+    const starField = new Points(starGeo, starMat)
+    starField.frustumCulled = false
+    scene.add(starField)
+
+    applyTheme(dark) // init 即按当前主题初始化，防暗色访客首帧闪现亮板
+    applyThemeRef.current = applyTheme
+
+    // ── morph 调度（初始停在星河，随后进入四形态循环） ───────
+    let stage = GALAXY_INDEX
+    let next = (GALAXY_INDEX + 1) % shapes.length
     let t = 0
     const HOLD = 4.2
     const MORPH = 2.2
     let phase = 'hold'
     const clockPrev = { v: performance.now() }
+    let elapsed = 0 // 累计时长驱动 twinkle（暂停不累积，恢复无跳变）
     const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 
     // ── 相机鼠标视差 ─────────────────────────────────────────
@@ -194,14 +394,16 @@ export default function HeroSphere({ dark = false }) {
     const resize = () => {
       const parent = canvas.parentElement
       if (!parent) return
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const d = Math.min(window.devicePixelRatio || 1, 2)
       const w = parent.clientWidth
       const h = parent.clientHeight
       if (w > 0 && h > 0) {
-        renderer.setPixelRatio(dpr)
+        renderer.setPixelRatio(d)
         renderer.setSize(w, h, false)
         camera.aspect = w / h
         camera.updateProjectionMatrix()
+        uniforms.uPixelRatio.value = d
+        uniforms.uScale.value = h * 0.5
         return true
       }
       return false
@@ -226,6 +428,8 @@ export default function HeroSphere({ dark = false }) {
 
       const dt = Math.min((now - clockPrev.v) / 1000, 0.05)
       clockPrev.v = now
+      elapsed += dt
+      uniforms.uTime.value = elapsed
 
       // morph 状态机
       t += dt
@@ -253,13 +457,13 @@ export default function HeroSphere({ dark = false }) {
       // 相机视差（场景随鼠标轻摆）
       mx += (tx - mx) * 0.04
       my += (ty - my) * 0.04
-      camera.position.x = mx * 1.6
-      camera.position.y = -my * 1.1
+      camera.position.x = mx * 2.2
+      camera.position.y = 2.2 - my * 1.4
       camera.lookAt(0, 0, 0)
 
       // 极慢自转（morph 为视觉主角）
-      points.rotation.y += dt * 0.06
-      ring.rotation.z += dt * 0.04
+      points.rotation.y += dt * 0.036       // 银盘极慢自转
+      starField.rotation.y -= dt * 0.0072   // 远景反向缓移
 
       renderer.render(scene, camera)
     }
@@ -319,7 +523,7 @@ export default function HeroSphere({ dark = false }) {
         points,
         material,
         geometry: geo,
-        ring,
+        starField,
         stage: () => stageNames[stage],
         resize,
       }
@@ -339,18 +543,11 @@ export default function HeroSphere({ dark = false }) {
       }
       geo.dispose()
       material.dispose()
-      ringMat.dispose()
-      ring.geometry.dispose()
+      starGeo.dispose()
+      starMat.dispose()
       renderer.dispose()
     }
   }, [])
-
-  // 主题联动：暗色时雾色切暖深褐（与页面底色一致），粒子保持可见
-  useEffect(() => {
-    const s = sceneRef.current
-    if (!s) return
-    s.fog.color.set(dark ? 0x16181d : 0xfbf7f1)
-  }, [dark])
 
   // 星云切换（同构 layout effect：commit 后、绘制前执行，防暗色首帧闪现亮板）
   useIsomorphicLayoutEffect(() => {
