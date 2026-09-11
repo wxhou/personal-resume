@@ -23,6 +23,10 @@
   --accent-hover: #C2705B;
   --accent-soft: rgba(184, 107, 93, 0.10);
 
+  /* 卡片材质（design D2）：暖灰双层软阴影——纸张从桌面微微抬起。
+     暖灰取 --text-soft 同族（纯黑影在米底发脏）；暗色覆写保留发丝线（见暗色 token 块） */
+  --shadow-card: 0 1px 2px rgba(110, 102, 91, 0.06), 0 6px 20px rgba(110, 102, 91, 0.08);
+
   /* ── 字号比例（1.333 完美四度） ── */
   /* base 16 → 16 / 21 / 28 / 37 / 49 / 65（clamp 控两端） */
   --fs-display: clamp(2.5rem, 5.5vw, 4.75rem);   /* 40–76px：h1 */
@@ -49,9 +53,15 @@
   min-height: 100vh;
   padding-top: 64px; /* site nav height */
   background-color: var(--bg-page);
-  /* 点阵纸纹（antfu/pseudoyu 同款 dotted grid）：米底上的印刷纸肌理 */
-  background-image: radial-gradient(rgba(52, 48, 42, 0.06) 1px, transparent 1px);
-  background-size: 22px 22px;
+  /* 纸面光感（design D1）：radial vignette 页顶亮→页尾沉，与暗色氛围光语法对称。
+     几何语义：120% 相对整个文档而非视口——「光从页顶来」属有意设计，勿改 fixed attachment（移动端坑）。
+     与点阵两层 background-image 并列（vignette 在下、点阵在上），background-size 按层声明 */
+  /* 点阵 0.20（design D4 B 档定稿）：低于 ~0.14 被 sRGB gamma 压到不可辨；
+     备选 D 档 0.16/1.5px 大点径——若与加浓银心打架则回退（见 tasks 4.2） */
+  background-image:
+    radial-gradient(120% 120% at 50% 0%, #FDFBF7 0%, var(--bg-page) 45%, #F7F1E7 100%),
+    radial-gradient(rgba(52, 48, 42, 0.20) 1px, transparent 1px);
+  background-size: 100% 100%, 22px 22px;
   color: var(--text-base);
   font-family: 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
   font-size: var(--fs-body);
@@ -159,8 +169,7 @@
   line-height: var(--lh-relaxed);
   color: var(--text-base);
   border: 1px solid var(--surface-border);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.32);
   padding: 18px 20px;
   border-radius: 4px;
   box-shadow: 0 4px 24px rgba(110, 102, 91, 0.06);
@@ -297,7 +306,9 @@
   gap: 7px;
   padding: 5px 12px 5px 6px;
   border: 1px solid var(--surface-border);
-  background: var(--surface);
+  /* 低透明度纯色底（不用 backdrop-filter：blur 会把背后 2-3px 的粒子糊成不可见的微光），
+     银河粒子清晰穿过徽章 */
+  background: color-mix(in srgb, var(--surface) 38%, transparent);
   border-radius: 4px;
   font-family: 'JetBrains Mono', monospace;
   font-size: var(--fs-small);
@@ -525,7 +536,7 @@
   transition: border-color var(--dur-out) var(--ease-out),
               transform var(--dur-out) var(--ease-out),
               background var(--dur-out) var(--ease-out);
-  box-shadow: 0 1px 0 rgba(52, 48, 42, 0.02);
+  box-shadow: var(--shadow-card);
 }
 
 .home-project:hover {
@@ -630,6 +641,7 @@
   border-radius: 4px;
   border: 1px solid var(--surface-border);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
   transition: border-color var(--dur-out) var(--ease-out);
 }
 
@@ -671,6 +683,7 @@
   border-radius: 4px;
   border: 1px solid var(--surface-border);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
   transition: transform var(--dur-out) var(--ease-out),
               border-color var(--dur-out) var(--ease-out);
 }
@@ -712,6 +725,7 @@
   border: 1px solid var(--surface-border);
   background: var(--surface);
   border-top: 2px solid var(--accent);
+  box-shadow: var(--shadow-card);
 }
 
 .home-fact__id {
@@ -748,6 +762,7 @@
   border: 1px solid var(--surface-border);
   border-top: 2px solid var(--accent);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
   transition: border-color var(--dur-out) var(--ease-out),
               transform var(--dur-out) var(--ease-out);
 }
@@ -900,6 +915,7 @@
   border-radius: 4px;
   border: 1px solid var(--surface-border-strong);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
   font-size: var(--fs-body-lg);
   color: var(--text-strong);
   transition: border-color var(--dur-out) var(--ease-out),
@@ -995,9 +1011,14 @@
   --accent-hover: #DB9787;
   --accent-soft: rgba(206, 133, 116, 0.14);
 
+  /* 暗色无卡影（层次由亮度阶梯天然成立），仅保留 project 卡原有发丝线（改动前即有） */
+  --shadow-card: 0 1px 0 rgba(52, 48, 42, 0.02);
+
   background-color: var(--bg-page);
-  /* 点阵纹理换浅色点，α 提高至暗底可辨（亮色版是暖深色点 0.06） */
+  /* 点阵纹理换浅色点，α 提高至暗底可辨（亮色版是暖深色点）；暗色无 vignette（纯平涂深底）
+     background-size 必须显式重设：基态因 vignette 变两值列表，单层继承会取首个 100% 撑爆点阵 */
   background-image: radial-gradient(rgba(232, 236, 244, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 /* 暗色氛围光：深赭红椭圆光晕透过粒子云提供纵深（纯 CSS 零 DOM，不拦截交互） */
@@ -1026,9 +1047,9 @@
   );
 }
 
-/* 暗色下硬编码亮色表面的覆写 */
+/* 暗色下硬编码亮色表面的覆写（低 alpha：粒子清晰透过面板） */
 :root[data-theme="dark"] .home-page .home-hero__console {
-  background: rgba(46, 41, 36, 0.72);
+  background: rgba(35, 40, 51, 0.42);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
