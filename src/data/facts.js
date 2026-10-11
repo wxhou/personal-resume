@@ -17,5 +17,4 @@ export const heroStatement = {
   headline: '用 AI 解决真实问题',
   subtitle: 'Bigger蓝莓 · GitHub @wxhou',
   tagline: '把 AI 编程与开源工具作为创作媒介，全部开源在 GitHub。',
-  status: 'OPEN SOURCE · AI · WXHOU',
 }
