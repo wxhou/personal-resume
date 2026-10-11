@@ -4,7 +4,7 @@
 // 字符集扫描范围: src/**/*.{jsx,js,css} + index.html + src/data/*.json
 //   （含 CountUp 数字、GitHub 实时数据等动态文本的字符空间）
 // 输出: src/assets/fonts/<sans|serif>-<weight>.woff2 单文件/字重 + index.css（4 条 @font-face）
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { resolve, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import subsetFont from 'subset-font'

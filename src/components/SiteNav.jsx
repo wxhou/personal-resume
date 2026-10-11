@@ -15,8 +15,10 @@ export default function SiteNav() {
   const onHome = pathname === '/'
 
   // 主题图标状态：监听 <html> data-theme 变化（与 HomePage 解耦，经 dataset 桥接）
+  // 初值必须在 mount 后读：SSG 预渲染阶段无 document，lazy initializer 会让构建失败
   const [theme, setTheme] = useState('light')
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSG 无 document，只能 post-mount 读
     setTheme(document.documentElement.dataset.theme || 'light')
     const observer = new MutationObserver(() => {
       setTheme(document.documentElement.dataset.theme || 'light')

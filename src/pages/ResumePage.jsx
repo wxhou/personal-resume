@@ -74,7 +74,7 @@ export default function ResumePage() {
     document.documentElement.setAttribute('data-theme', theme)
     try {
       localStorage.setItem('resume-theme', theme)
-    } catch {}
+    } catch { /* 隐私模式 localStorage 不可用，忽略 */ }
   }, [theme])
 
   const exportPDF = async () => {
