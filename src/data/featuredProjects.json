@@ -40,6 +40,8 @@
       "description": "免费 LLM API 精选列表，收录有验证免费额度的服务",
       "language": "Markdown",
       "url": "https://github.com/wxhou/free-llm-api-list",
+      "demo": "https://freellms.wxhou.top/",
+      "demoPreview": { "type": "image", "src": "/previews/freellms-2026-10.jpg", "note": "快照 · 2026-10" },
       "tag": "资源清单",
       "tech": ["LLM", "API"]
     },
@@ -59,6 +61,33 @@
       "demo": "https://llm-course-tsinghua.pages.dev/",
       "tag": "学习教程",
       "tech": ["TypeScript", "LLM"]
+    },
+    {
+      "name": "minifly",
+      "description": "小飞压：免费在线压缩图片、视频、PDF、PPT，全部在浏览器本地完成",
+      "language": "TypeScript",
+      "demo": "https://minifly.wxhou.top/zh/",
+      "demoPreview": { "type": "image", "src": "/previews/minifly-2026-10.jpg", "note": "快照 · 2026-10" },
+      "tag": "在线工具",
+      "tech": ["图片压缩", "视频", "PDF", "PPT"]
+    },
+    {
+      "name": "busuanzi",
+      "description": "卜算子：命盘排盘与温和解读的个人创作站",
+      "language": "TypeScript",
+      "demo": "https://busuanzi.wxhou.top/",
+      "demoPreview": { "type": "image", "src": "/previews/busuanzi-2026-10.jpg", "note": "快照 · 2026-10" },
+      "tag": "个人作品",
+      "tech": ["排盘", "命理"]
+    },
+    {
+      "name": "floorplan-3d-eta",
+      "description": "户型装修设计：2D 平面与 3D 场景的户型编辑器，含家具摆放与装修计价",
+      "language": "TypeScript",
+      "demo": "https://floorplan-3d-eta.vercel.app/",
+      "demoPreview": { "type": "image", "src": "/previews/floorplan-2026-10.jpg", "note": "快照 · 2026-10" },
+      "tag": "3D 应用",
+      "tech": ["2D 平面", "3D 场景", "装修计价"]
     }
   ],
   "more": [

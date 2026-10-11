@@ -3,7 +3,7 @@ import { motion, useInView, animate, useReducedMotion } from 'framer-motion'
 import { Head } from 'vite-react-ssg'
 // 字体子集（构建期 scripts/subset-fonts.js 生成，见 openspec change perf-font-subset-idle-render）
 import '../assets/fonts/index.css'
-import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, FileText, FolderGit2 } from 'lucide-react'
+import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, Download, FolderGit2 } from 'lucide-react'
 import { personalInfo, skills, personalLinks } from '../data/resume.js'
 import featuredData from '../data/featuredProjects.json'
 import { facts, heroStatement } from '../data/facts.js'
@@ -18,17 +18,18 @@ const dataFiles = import.meta.glob('../data/blog.json', { eager: true })
 const blogPosts = dataFiles['../data/blog.json']?.default ?? []
 
 // github-stats.json 为构建时生成（.gitignore），客户端 mount 后再刷新真·实时
-// 兜底值来源：2026-08-22 gh api 实测（stars=10, public_repos=104）
+// 兜底值来源：2026-08-22 gh api 实测（stars=10, public_repos=104）；npm 2026-10-11（3701/月）
 const ghStatFiles = import.meta.glob('../data/github-stats.json', { eager: true })
-const initialGhStats = ghStatFiles['../data/github-stats.json']?.default ?? { stars: 10, repos: 104 }
+const initialGhStats = ghStatFiles['../data/github-stats.json']?.default ?? { stars: 10, repos: 104, downloads: 3701 }
 
-// GitHub 公开数据实时刷新：构建值为初始，mount 后拉 GitHub REST API 覆盖
+// GitHub 公开数据与 npm 月下载：构建值为初始，mount 后拉 API 覆盖
 // API 来源: https://docs.github.com/en/rest/repos/repos · /rest/users/users（未认证 60 req/h/IP）
+//           https://api.npmjs.org/downloads/point/last-month/{pkg}（npm downloads API，CORS 开放）
 // sessionStorage 缓存 10 分钟防限流；全部失败时静默保留构建值
 function useGitHubStats(initial) {
   const [stats, setStats] = useState(initial)
   const statsRef = useRef(initial)
-  statsRef.current = stats
+  useEffect(() => { statsRef.current = stats }) // render 期写 ref 属反模式，改为 commit 后同步
 
   useEffect(() => {
     const CACHE_KEY = 'gh-stats-v1'
@@ -38,6 +39,9 @@ function useGitHubStats(initial) {
     try {
       const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null')
       if (cached && Date.now() - cached.t < TTL && cached.stats) {
+        // sessionStorage 只在客户端存在；SSG 预渲染与客户端首帧必须同值，
+        // 缓存命中值的写入只能在 mount 后进行（移入 useState 初始化器会 hydration 报文不一致）
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- 见上：hydration 对齐
         setStats(cached.stats)
         return () => { cancelled = true }
       }
@@ -46,13 +50,15 @@ function useGitHubStats(initial) {
     Promise.allSettled([
       fetch('https://api.github.com/repos/wxhou/openspec-playwright').then(r => (r.ok ? r.json() : null)),
       fetch('https://api.github.com/users/wxhou').then(r => (r.ok ? r.json() : null)),
-    ]).then(([repo, user]) => {
+      fetch('https://api.npmjs.org/downloads/point/last-month/openspec-playwright').then(r => (r.ok ? r.json() : null)),
+    ]).then(([repo, user, npm]) => {
       if (cancelled) return
       const stars = repo.status === 'fulfilled' ? repo.value?.stargazers_count : null
       const repos = user.status === 'fulfilled' ? user.value?.public_repos : null
-      if (stars == null && repos == null) return // 全部失败保留构建值
+      const downloads = npm.status === 'fulfilled' && Number.isFinite(npm.value?.downloads) ? npm.value.downloads : null
+      if (stars == null && repos == null && downloads == null) return // 全部失败保留构建值
       const prev = statsRef.current
-      const next = { stars: stars ?? prev.stars, repos: repos ?? prev.repos }
+      const next = { stars: stars ?? prev.stars, repos: repos ?? prev.repos, downloads: downloads ?? prev.downloads }
       setStats(next)
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), stats: next })) } catch { /* 忽略 */ }
     })
@@ -166,7 +172,8 @@ function CountUp({ value, prefix = '', suffix = '', delay = 0 }) {
   const currentRef = useRef(0) // 当前显示值，value 变化时的滚动起点
   const inView = useInView(ref, { once: true, amount: 0.4 })
   const reduced = useReducedMotion()
-  const finalText = `${prefix}${value}${suffix}`
+  const fmt = (n) => n.toLocaleString('en-US')
+  const finalText = `${prefix}${fmt(value)}${suffix}`
 
   useEffect(() => {
     if (!inView || !ref.current) return
@@ -182,13 +189,37 @@ function CountUp({ value, prefix = '', suffix = '', delay = 0 }) {
       onUpdate: (v) => {
         const n = Math.round(v)
         currentRef.current = n
-        if (ref.current) ref.current.textContent = `${prefix}${n}${suffix}`
+        if (ref.current) ref.current.textContent = `${prefix}${fmt(n)}${suffix}`
       },
     })
     return () => controls.stop()
+    // finalText 是 value/prefix/suffix 的派生串，已包含于依赖列表；字面量形式不入键
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, reduced, value, prefix, suffix, delay])
 
   return <span ref={ref}>{reduced ? finalText : `${prefix}0${suffix}`}</span>
+}
+
+// 卡面内容（编号、LIVE、tag、名称、描述、tech）；Georgia 区分有/无仓库卡的容器选择
+function CardBody({ project, index }) {
+  return (
+    <>
+      <div className="home-project__head">
+        <span className="home-project__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+        <span className="home-project__head-right">
+          {project.demo && <span className="home-project__live">LIVE</span>}
+          <span className="home-project__tag">{project.tag}</span>
+        </span>
+      </div>
+      <div className="home-project__name">{project.name}</div>
+      <div className="home-project__desc">{project.description}</div>
+      <div className="home-project__tech">
+        {project.tech.map(t => (
+          <span key={t} className="home-project__chip">{t}</span>
+        ))}
+      </div>
+    </>
+  )
 }
 
 // 在线站点卡的悬停预览窗：hover 稳定 180ms 后挂载预览（iframe 实时 / 快照图），点窗进站
@@ -201,7 +232,9 @@ function ProjectCard({ project, index }) {
   const dwellRef = useRef(null)
 
   // matchMedia 判断放 effect：SSR 与客户端首帧渲染一致，悬停能力挂载后再确认
+  // （移入 useState 初始化器会让 SSG 预渲染 HTML 带上桌面端标记，与触屏真机首帧不一致）
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 见上：SSR/hover 能力探测必须 post-mount
     setHoverCapable(window.matchMedia('(hover: hover) and (pointer: fine)').matches)
     return () => clearTimeout(dwellRef.current)
   }, [])
@@ -230,27 +263,20 @@ function ProjectCard({ project, index }) {
 
   return (
     <div className="home-project" onPointerEnter={onEnter} onPointerLeave={onLeave}>
-      <a
-        href={project.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="home-project__body"
-      >
-        <div className="home-project__head">
-          <span className="home-project__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-          <span className="home-project__head-right">
-            {project.demo && <span className="home-project__live">LIVE</span>}
-            <span className="home-project__tag">{project.tag}</span>
-          </span>
+      {project.url ? (
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="home-project__body"
+        >
+          <CardBody project={project} index={index} />
+        </a>
+      ) : (
+        <div className="home-project__body">
+          <CardBody project={project} index={index} />
         </div>
-        <div className="home-project__name">{project.name}</div>
-        <div className="home-project__desc">{project.description}</div>
-        <div className="home-project__tech">
-          {project.tech.map(t => (
-            <span key={t} className="home-project__chip">{t}</span>
-          ))}
-        </div>
-      </a>
+      )}
       <div className="home-project__links">
         {project.demo && (
           <a
@@ -263,15 +289,17 @@ function ProjectCard({ project, index }) {
             <ExternalLink size={12} />
           </a>
         )}
-        <a
-          href={project.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="home-project__link"
-        >
-          GitHub
-          <ExternalLink size={12} />
-        </a>
+        {project.url && (
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="home-project__link"
+          >
+            GitHub
+            <ExternalLink size={12} />
+          </a>
+        )}
       </div>
       {preview && (
         <div
@@ -404,34 +432,76 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // 磁吸按钮：鼠标进入 CTA 周边 100px 时向光标位移 30%，离开回弹
+  // 磁吸按钮：rAF 阻尼随动（位移逐帧 lerp 逼近光标），进 100px 吸附 / 出 80px 释放——
+  // 单阈值下光标在边界 ±1px 会导致吸附↔复位反复翻转（ CSS 换挡 transition 打架 = 边界乱抖），双阈值消抖
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const noHover = window.matchMedia('(hover: none)').matches
     if (reduced || noHover) return
-    const zone = document.querySelector('.home-hero__ctas')
-    const btn = zone?.querySelector('.home-hero__cta')
+    const btn = document.querySelector('.home-hero__ctas .home-hero__cta')
     if (!btn) return
-    const RADIUS = 100
+    const ENTER = 100
+    const EXIT = 80
     const PULL = 0.3
-    const onMove = (e) => {
+    const EASE = 0.16 // 每帧 lerp：带一点惯性的跟随
+    let attracted = false
+    let cx = 0, cy = 0, tx = 0, ty = 0 // 当前/目标位移
+    let ax = 0, ay = 0 // 吸附瞬间的按钮原位中心（transform≈0），目标位移以此为基准，避免移动中几何自反馈
+    let raf = 0
+
+    const edgeDist = (e) => {
       const r = btn.getBoundingClientRect()
-      const near =
-        e.clientX > r.left - RADIUS && e.clientX < r.right + RADIUS &&
-        e.clientY > r.top - RADIUS && e.clientY < r.bottom + RADIUS
-      if (near) {
-        const cx = r.left + r.width / 2
-        const cy = r.top + r.height / 2
+      const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right)
+      const dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom)
+      return Math.hypot(dx, dy)
+    }
+    const onMove = (e) => {
+      if (!attracted) {
+        if (edgeDist(e) >= ENTER) return
+        attracted = true
+        const r = btn.getBoundingClientRect()
+        ax = r.left + r.width / 2
+        ay = r.top + r.height / 2
+      } else if (edgeDist(e) > EXIT) {
+        attracted = false
+        tx = 0
+        ty = 0
+      }
+      if (attracted) {
+        tx = (e.clientX - ax) * PULL
+        ty = (e.clientY - ay) * PULL
+      }
+      kick()
+    }
+    const loop = () => {
+      cx += (tx - cx) * EASE
+      cy += (ty - cy) * EASE
+      if (Math.abs(tx - cx) <= 0.15 && Math.abs(ty - cy) <= 0.15) {
+        if (!attracted) {
+          btn.classList.remove('is-magnet')
+          btn.style.removeProperty('transform')
+          raf = 0
+          return
+        }
+        cx = tx
+        cy = ty
+        btn.style.transform = `translate(${tx}px, ${ty}px)`
+        raf = 0
+        return
+      }
+      btn.style.transform = `translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`
+      raf = requestAnimationFrame(loop)
+    }
+    const kick = () => {
+      if (!raf) {
         btn.classList.add('is-magnet')
-        btn.style.transform = `translate(${(e.clientX - cx) * PULL}px, ${(e.clientY - cy) * PULL}px)`
-      } else if (btn.style.transform) {
-        btn.classList.remove('is-magnet') // 回落到 300ms transition，形成回弹
-        btn.style.removeProperty('transform')
+        raf = requestAnimationFrame(loop)
       }
     }
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => {
       window.removeEventListener('pointermove', onMove)
+      if (raf) cancelAnimationFrame(raf)
       btn.classList.remove('is-magnet')
       btn.style.removeProperty('transform')
     }
@@ -460,22 +530,31 @@ export default function HomePage() {
 
       {/* ─── Hero ─── */}
       <motion.section className="home-hero" variants={heroEnter} initial="hidden" animate="visible" custom={0}>
-        {/* 椭圆描边（参考站 signature 元素，横跨 hero 顶部） */}
+        {/* 椭圆描边（参考站 signature 元素，横跨 hero 顶部）；两端渐隐——纸面上弧线两端
+            生硬截断会与内容互抢，只有绕银心的一段保留存在感 */}
         <svg
           className="home-hero__ellipse"
           viewBox="0 0 1400 420"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
+          <defs>
+            <linearGradient id="arc-ink" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1400" y2="0">
+              <stop offset="0" stopColor="#B86B5D" stopOpacity="0" />
+              <stop offset="0.16" stopColor="#B86B5D" stopOpacity="0.18" />
+              <stop offset="0.5" stopColor="#B86B5D" stopOpacity="0.35" />
+              <stop offset="0.84" stopColor="#B86B5D" stopOpacity="0.18" />
+              <stop offset="1" stopColor="#B86B5D" stopOpacity="0" />
+            </linearGradient>
+          </defs>
           <ellipse
             cx="700"
             cy="210"
             rx="680"
             ry="170"
             fill="none"
-            stroke="#B86B5D"
+            stroke="url(#arc-ink)"
             strokeWidth="1"
-            strokeOpacity="0.35"
           />
         </svg>
         {/* 金尘粒子（暖色三色：森林 / 赭土 / 米雾），压在椭圆之下内容之下 */}
@@ -539,18 +618,21 @@ export default function HomePage() {
         {/* 身份徽章行：Creator of + 精选项目 chip（antfu/pseudoyu 同款） */}
         <div className="home-idbadge-row">
           <span className="home-idbadge-row__label">Creator of</span>
-          {featured.map(project => (
-            <a
-              key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="home-idbadge"
-            >
-              <span className="home-idbadge__mono" aria-hidden="true">{project.name.slice(0, 2)}</span>
-              {project.name}
-            </a>
-          ))}
+          {featured.map(project => {
+            const chipHref = project.url || project.demo
+            return (
+              <a
+                key={project.name}
+                href={chipHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="home-idbadge"
+              >
+                <span className="home-idbadge__mono" aria-hidden="true">{project.name.slice(0, 2)}</span>
+                {project.name}
+              </a>
+            )
+          })}
         </div>
         <div className="home-hero__ctas">
           <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-hero__cta">
@@ -597,7 +679,7 @@ export default function HomePage() {
 
       {/* ─── 精选项目 ─── */}
       <section id="projects" className="home-section">
-        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="7 个精选开源项目：测试代理、AI 工具、教程站与实验作品。" />
+        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="10 个作品：开源工具、AI 应用、在线站点与实验。" />
         <Reveal>
         <div className="home-projects">
           {featured.map((project, i) => (
@@ -643,10 +725,10 @@ export default function HomePage() {
             <span className="home-proof__value"><CountUp value={githubStats.stars} delay={0.09} /></span>
             <span className="home-proof__label">openspec-playwright 开源 star</span>
           </a>
-          <a className="home-proof__card" href="https://www.cnblogs.com/wxhou" target="_blank" rel="noopener noreferrer">
-            <FileText size={22} className="home-proof__icon" />
-            <span className="home-proof__value"><CountUp value={20} suffix=" 篇" delay={0.18} /></span>
-            <span className="home-proof__label">博客园技术文章</span>
+          <a className="home-proof__card" href="https://www.npmjs.com/package/openspec-playwright" target="_blank" rel="noopener noreferrer">
+            <Download size={22} className="home-proof__icon" />
+            <span className="home-proof__value"><CountUp value={githubStats.downloads} delay={0.18} /></span>
+            <span className="home-proof__label">openspec-playwright npm 月下载</span>
           </a>
         </div>
         </Reveal>
@@ -679,7 +761,7 @@ export default function HomePage() {
       {/* ─── 最新博客 ─── */}
       {blogPosts.length > 0 && (
         <section id="blog" className="home-section">
-          <SectionHeader index="04" label="WRITING" title="最新博客" note="博客园持续输出的技术文章。" />
+          <SectionHeader index="04" label="WRITING" title="旧文存档" note="博客园时期的痕迹——后来的产出都在 GitHub。" />
           <Reveal>
           <div className="home-blog">
             {blogPosts.slice(0, 5).map(post => (
