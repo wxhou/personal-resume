@@ -112,7 +112,7 @@
       "description": "言阶 · 表达力训练：职场表达场景练习 App，每天 2 分钟读一段、练一次",
       "language": "TypeScript",
       "demo": "https://yanjie-app-proxy.wxhou.workers.dev/",
-      "demoPreview": { "type": "image", "src": "/previews/yanjie-2026-10.jpg", "note": "快照 · 2026-10" },
+      "demoPreview": { "type": "image", "src": "/previews/yanjie-2026-10-v3.jpg", "note": "快照 · 2026-10" },
       "tag": "AI 应用",
       "tech": ["表达训练", "职场场景", "打卡"]
     }
