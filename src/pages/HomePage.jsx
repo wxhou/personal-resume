@@ -583,7 +583,7 @@ export default function HomePage() {
             <span className="home-hero__console-key">stack</span>
           </div>
           <div className="home-hero__console-line">
-            <span className="home-hero__console-val">LangChain · RAG · Dify · Agent</span>
+            <span className="home-hero__console-val">Claude Code · Dify · Python</span>
           </div>
           <div className="home-hero__console-line">
             <span className="home-hero__console-prompt">$</span>
@@ -742,7 +742,7 @@ export default function HomePage() {
       {/* ─── 最新博客 ─── */}
       {blogPosts.length > 0 && (
         <section id="blog" className="home-section">
-          <SectionHeader index="04" label="WRITING" title="旧文存档" note="博客园时期的痕迹——后来的产出都在 GitHub。" />
+          <SectionHeader index="04" label="WRITING" title="旧文存档" />
           <Reveal>
           <div className="home-blog">
             {blogPosts.slice(0, 5).map(post => (
