@@ -82,5 +82,5 @@ export const evaluations = [
 export const personalLinks = [
   { name: '博客园', url: 'https://www.cnblogs.com/wxhou' },
   { name: 'Gitee', url: 'https://gitee.com/wxhou' },
-  { name: 'OpenSpec Playwright', url: 'https://wxhou.github.io/openspec-playwright/' },
+  { name: 'OpenSpec Playwright', url: 'https://openspec-playwright.pages.dev/' },
 ]

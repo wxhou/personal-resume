@@ -615,25 +615,6 @@ export default function HomePage() {
         </h1>
         <p className="home-hero__subtitle">{heroStatement.subtitle}</p>
         <p className="home-hero__tagline">{heroStatement.tagline}</p>
-        {/* 身份徽章行：Creator of + 精选项目 chip（antfu/pseudoyu 同款） */}
-        <div className="home-idbadge-row">
-          <span className="home-idbadge-row__label">Creator of</span>
-          {featured.map(project => {
-            const chipHref = project.url || project.demo
-            return (
-              <a
-                key={project.name}
-                href={chipHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="home-idbadge"
-              >
-                <span className="home-idbadge__mono" aria-hidden="true">{project.name.slice(0, 2)}</span>
-                {project.name}
-              </a>
-            )
-          })}
-        </div>
         <div className="home-hero__ctas">
           <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="home-hero__cta">
             <Github size={16} />

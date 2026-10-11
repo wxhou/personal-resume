@@ -275,84 +275,6 @@
   z-index: 2;
 }
 
-/* ─── 身份徽章行（antfu/pseudoyu 同款：Creator of + 项目 chip） ─── */
-.home-idbadge-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 0 30px;
-  position: relative;
-  z-index: 2;
-}
-
-/* 桌面端避开右上角控制台面板（absolute 定位，宽约 372px），防止 chip 被遮不可点 */
-@media (min-width: 1025px) {
-  .home-idbadge-row {
-    max-width: 720px;
-  }
-}
-
-.home-idbadge-row__label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: var(--fs-micro);
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--text-soft);
-  margin-right: 4px;
-}
-
-.home-idbadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 12px 5px 6px;
-  border: 1px solid var(--surface-border);
-  /* 低透明度纯色底（不用 backdrop-filter：blur 会把背后 2-3px 的粒子糊成不可见的微光），
-     银河粒子清晰穿过徽章 */
-  background: color-mix(in srgb, var(--surface) 38%, transparent);
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: var(--fs-small);
-  color: var(--text-base);
-  transition: border-color var(--dur-out) var(--ease-out),
-              color var(--dur-out) var(--ease-out),
-              transform var(--dur-out) var(--ease-out);
-}
-
-.home-page .home-idbadge:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
-}
-
-/* monogram 方块：三色轮换（label 是 span，chip 是 a，nth-of-type 按 a 计数） */
-.home-idbadge:nth-of-type(3n + 1) .home-idbadge__mono {
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-.home-idbadge:nth-of-type(3n + 2) .home-idbadge__mono {
-  background: rgba(52, 48, 42, 0.07);
-  color: var(--text-strong);
-}
-.home-idbadge:nth-of-type(3n) .home-idbadge__mono {
-  background: rgba(184, 107, 93, 0.16);
-  color: #8a4d3d;
-}
-
-.home-idbadge__mono {
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  flex-shrink: 0;
-}
-
 /* ─── Hero 实时数据行（innei 同款：一行安静的事实） ─── */
 .home-hero__stats {
   display: flex;
@@ -1321,22 +1243,6 @@
   }
   .home-footer {
     padding: 40px 20px 64px;
-  }
-  /* 7 个 chip 竖排会吃掉整个首屏：收成横向滚动单行，Creator of 标签固定首位 */
-  .home-idbadge-row {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 6px;
-  }
-  .home-idbadge-row::-webkit-scrollbar {
-    display: none;
-  }
-  .home-idbadge-row__label {
-    flex-shrink: 0;
-  }
-  .home-idbadge {
-    flex-shrink: 0;
   }
   .home-post {
     flex-direction: column;
