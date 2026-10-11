@@ -31,20 +31,22 @@ const GALAXY_INDEX = 3 // shapes 中星河的下标 = 初始展示形态
 
 // 双主题银河：色温插值两端（inside=银心，outside=旋臂外缘）+ 远景星
 // 暗色 additive 星云（软核光晕叠加发光）；亮色「墨色星图」——纸上天文图：
-// 无光晕浓墨实点（coreExp 小 = 点缘锐利），密度堆出银心，最亮一撮星手染赭红。
+// 墨点半透明（~0.5），重叠处 alpha 叠压自然变浓——银心密度靠墨的叠压编码，
+// 与暗色的发光叠加（additive）互为对偶物理。实心不透明墨点会把密度信
+// 息抹平（纸上看不出旋臂），这是亮色「没有暗色好看」的根因。
 // 亮色沿用暗色的软光晕渲染会读作「纸面污渍」——发光模型只属于暗底
 const PALETTES = {
   light: {
-    inside: new Color(0x3a352d),  // 银心 浓墨
-    outside: new Color(0x7a7164), // 旋臂外 淡墨（越远越淡，印刷褪色感）
-    star: new Color(0x4a443b),    // 远景星 墨灰
-    accent: new Color(0xa05238),  // 亮星 手染赭红（站点强调色同族）
+    inside: new Color(0x2e343c),  // 银心 冷墨（青石深墨：与暗色冷底同族，托起暖纸冷墨的反差）
+    outside: new Color(0x76828c), // 旋臂外 青墨（越远越淡，铜版画褪色感）
+    star: new Color(0x5a6572),    // 远景星 石墨灰（冷，与银河同族）
+    accent: new Color(0xa05238),  // 亮星 手染赭红（暖纸冷墨里的唯一暖，视觉焦点同族）
     additive: false,
-    opacity: 1.0,   // 版画墨是实心的：0.95 的空隙会让银心发飘（design D3）
-    pointScale: 0.9,
-    coreExp: 1.6,   // 小指数 = 实心墨点；暗色 3.0 = 软光晕
-    halo: 0.08,     // 高斯光晕强度：纸上不发光，压到近零
-    sizeFloor: 2.8, // 暗星下限抬一档，银心密度感增强（design D3）
+    opacity: 0.72,  // 半透明墨：重叠压深，密度=浓度（低 alpha + 墨晕靠叠压出层次）
+    pointScale: 1.2,
+    coreExp: 1.9,   // 实心偏软的核：叠压更均匀
+    halo: 0.18,     // 墨晕（洇开的边缘；0.22+ 在银心外的高密度点会读作污渍，实测收敛）
+    sizeFloor: 3.4, // 暗星下限抬一档，旋臂疏密可读
     twinkle: 0.55,  // 闪烁幅度收敛（纸面闪烁读作噪点抖动）
     accentMix: 1,
   },
@@ -86,7 +88,7 @@ export default function HeroSphere({ dark = false }) {
 
     const isMobile = window.innerWidth < 720
     const COUNT = isMobile ? 2400 : 4800 // 最大粒子数（密度上限）
-    let drawCount = isMobile ? 1600 : 3200 // 默认显示数
+    const drawCount = isMobile ? 1600 : 3200 // 默认显示数
 
     // ── Scene + Camera + Renderer ───────────────────────────
     const scene = new Scene()
@@ -291,8 +293,10 @@ export default function HeroSphere({ dark = false }) {
         starMat.blending = p.additive ? AdditiveBlending : NormalBlending
         starMat.needsUpdate = true
         starUniforms.uColor.value.copy(p.star)
-        starUniforms.uOpacity.value = isDark ? 0.55 : 0.8 // 亮色星图：远景星也要清晰可辨
-        starUniforms.uSizeFloor.value = isDark ? 0.8 : 1.6 // 纸上 1px 淡点不可见
+        // 亮色星场必须比主星系淡一档：纸上深色实点会抢成均匀噪点场，
+        // 把银河带的疏密结构整个淹没（同帧暗/亮对照实测）
+        starUniforms.uOpacity.value = isDark ? 0.55 : 0.5
+        starUniforms.uSizeFloor.value = isDark ? 0.8 : 1.2
       }
     }
 
@@ -547,9 +551,13 @@ export default function HeroSphere({ dark = false }) {
       starMat.dispose()
       renderer.dispose()
     }
+    // dark 刻意不进依赖：WebGL scene/geometry/material 只建一次，重跑会泄漏；
+    // 主题切换由下方 layout effect 经 applyThemeRef 命令式应用
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 星云切换（同构 layout effect：commit 后、绘制前执行，防暗色首帧闪现亮板）
+  // 星云切换（同构 layout effect：commit 后、绘制前执行，防暗色首帧闪现亮板；
+  // 色板参数经由 applyThemeRef 命令式应用，dark 是这个 effect 唯一触发源）
   useIsomorphicLayoutEffect(() => {
     applyThemeRef.current?.(dark)
   }, [dark])

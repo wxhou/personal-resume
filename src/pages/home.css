@@ -25,7 +25,7 @@
 
   /* 卡片材质（design D2）：暖灰双层软阴影——纸张从桌面微微抬起。
      暖灰取 --text-soft 同族（纯黑影在米底发脏）；暗色覆写保留发丝线（见暗色 token 块） */
-  --shadow-card: 0 1px 2px rgba(110, 102, 91, 0.06), 0 6px 20px rgba(110, 102, 91, 0.08);
+  --shadow-card: 0 1px 2px rgba(110, 102, 91, 0.08), 0 8px 24px rgba(110, 102, 91, 0.11);
 
   /* ── 字号比例（1.333 完美四度） ── */
   /* base 16 → 16 / 21 / 28 / 37 / 49 / 65（clamp 控两端） */
@@ -119,6 +119,8 @@
   max-width: 1280px;
   margin: 0 auto;
   overflow: hidden;
+  /* 灯照着纸：银河后一池暖白光（亮色专属语义，暗色 override 重置回自有光晕） */
+  background: radial-gradient(76% 58% at 62% 34%, rgba(255, 250, 240, 0.5), transparent 70%);
 }
 
 /* Hero 椭圆描边（参考站 signature 元素） */
@@ -416,9 +418,10 @@
   background: var(--accent-soft);
 }
 
-/* 磁吸态：快速跟随（离开时回落到上方 300ms transition，形成回弹） */
+/* 磁吸态：transition 关闭——位移由 JS rAF lerp 逐帧驱动，CSS 缓动会双重平滑（滞涩），
+   吸附/回弹的节奏全部由 lerp 系数控制 */
 .home-hero__cta.is-magnet {
-  transition: transform 0.12s ease-out;
+  transition: none;
 }
 
 /* SCROLL 提示（钉在首屏底部，参考站布局；滚动视差时淡出） */
@@ -872,11 +875,13 @@
 
 .home-proof__value {
   font-family: 'JetBrains Mono', monospace;
-  font-size: var(--fs-h2);
+  /* 数字是成果区的全部内容：display 级字号，卡片留白为它服务 */
+  font-size: clamp(2.4rem, 1.2rem + 3.2vw, 3.4rem);
   font-weight: 400;
-  line-height: var(--lh-heading);
+  line-height: 1;
   color: var(--text-strong);
   font-variant-numeric: tabular-nums slashed-zero;
+  margin: 2px 0 4px;
 }
 
 .home-proof__label {
@@ -1207,6 +1212,11 @@
   pointer-events: none;
 }
 
+/* 亮色 hero 光池仅在亮色语义成立：暗色恢复自有光晕结构（重置为无背景） */
+:root[data-theme="dark"] .home-page .home-hero {
+  background: none;
+}
+
 /* 暗色下卡片光斑增强：色随暗色 accent、透明度提高 */
 :root[data-theme="dark"] .home-project::after,
 :root[data-theme="dark"] .home-more__item::after,
@@ -1311,6 +1321,22 @@
   }
   .home-footer {
     padding: 40px 20px 64px;
+  }
+  /* 7 个 chip 竖排会吃掉整个首屏：收成横向滚动单行，Creator of 标签固定首位 */
+  .home-idbadge-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .home-idbadge-row::-webkit-scrollbar {
+    display: none;
+  }
+  .home-idbadge-row__label {
+    flex-shrink: 0;
+  }
+  .home-idbadge {
+    flex-shrink: 0;
   }
   .home-post {
     flex-direction: column;
