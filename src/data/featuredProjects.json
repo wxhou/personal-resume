@@ -88,6 +88,33 @@
       "demoPreview": { "type": "image", "src": "/previews/floorplan-2026-10.jpg", "note": "快照 · 2026-10" },
       "tag": "3D 应用",
       "tech": ["2D 平面", "3D 场景", "装修计价"]
+    },
+    {
+      "name": "deepthink",
+      "description": "自适应深度推理 Agent Skill：简单问题直答，复杂问题启动完整推理协议，一行命令装进 20+ AI 工具",
+      "language": "Python",
+      "url": "https://github.com/wxhou/deepthink",
+      "demo": "https://deepthink.wxhou.workers.dev/",
+      "tag": "AI 工具",
+      "tech": ["Agent Skill", "深度推理", "npx 安装"]
+    },
+    {
+      "name": "dshdesktop",
+      "description": "DeepSeek Harness Desktop：社区独立维护的桌面客户端，一键运行 Harness 无需 Node/Docker",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/deepseek-harness-desktop",
+      "demo": "https://dshdesktop.pages.dev/",
+      "tag": "桌面客户端",
+      "tech": ["DeepSeek", "桌面端", "开箱即用"]
+    },
+    {
+      "name": "yanjie",
+      "description": "言阶 · 表达力训练：职场表达场景练习 App，每天 2 分钟读一段、练一次",
+      "language": "TypeScript",
+      "demo": "https://yanjie-app-proxy.wxhou.workers.dev/",
+      "demoPreview": { "type": "image", "src": "/previews/yanjie-2026-10.jpg", "note": "快照 · 2026-10" },
+      "tag": "AI 应用",
+      "tech": ["表达训练", "职场场景", "打卡"]
     }
   ],
   "more": [
@@ -115,11 +142,6 @@
       "name": "obsidian-note",
       "description": "个人笔记",
       "url": "https://github.com/wxhou/obsidian-note"
-    },
-    {
-      "name": "deepthink",
-      "description": "Python 深度思考实验",
-      "url": "https://github.com/wxhou/deepthink"
     }
   ]
 }
