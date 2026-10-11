@@ -16,8 +16,9 @@ import { fileURLToPath } from 'node:url'
 const REPO = 'wxhou/openspec-playwright'
 const USER = 'wxhou'
 const NPM_PKG = 'openspec-playwright'
-// 首次兜底（无历史 json 时）：2026-10-11 GitHub API 实际返回
-const INITIAL = { stars: 10, repos: 104, downloads: 3701 }
+// 首次兜底（无历史 json 时）：2026-10-11 仓库页实测。
+// 注意 API 与仓库页曾出现不一致（匿名 API 边缘缓存返回 10，仓库页 11），故以仓库页为准
+const INITIAL = { stars: 11, repos: 104, downloads: 3701 }
 const OUT_PATH = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/github-stats.json')
 
 async function getJson(url, headers = {}) {

@@ -18,9 +18,9 @@ const dataFiles = import.meta.glob('../data/blog.json', { eager: true })
 const blogPosts = dataFiles['../data/blog.json']?.default ?? []
 
 // github-stats.json 为构建时生成（.gitignore），客户端 mount 后再刷新真·实时
-// 兜底值来源：2026-08-22 gh api 实测（stars=10, public_repos=104）；npm 2026-10-11（3701/月）
+// 兜底值来源：stars 2026-10-11 仓库页实测（与 INITIAL 保持一致）
 const ghStatFiles = import.meta.glob('../data/github-stats.json', { eager: true })
-const initialGhStats = ghStatFiles['../data/github-stats.json']?.default ?? { stars: 10, repos: 104, downloads: 3701 }
+const initialGhStats = ghStatFiles['../data/github-stats.json']?.default ?? { stars: 11, repos: 104, downloads: 3701 }
 
 // GitHub 公开数据与 npm 月下载：构建值为初始，mount 后拉 API 覆盖
 // API 来源: https://docs.github.com/en/rest/repos/repos · /rest/users/users（未认证 60 req/h/IP）
