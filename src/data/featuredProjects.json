@@ -5,16 +5,19 @@
       "description": "OpenSpec + Playwright 测试代理集成，让 AI 自动生成并执行端到端测试",
       "language": "TypeScript",
       "url": "https://github.com/wxhou/openspec-playwright",
+      "demo": "https://openspec-playwright.pages.dev/",
       "tag": "开源工具",
       "tech": ["TypeScript", "OpenSpec", "Playwright"]
     },
     {
       "name": "gpt-image2-prompt",
-      "description": "GPT Image to Prompt：从图片反推提示词的工具",
+      "description": "墨辞：GPT Image 2 提示词社区画廊，每张图附带可复制的完整 prompt",
       "language": "TypeScript",
       "url": "https://github.com/wxhou/gpt-image2-prompt",
+      "demo": "https://gpt-image2.wxhou.top/",
+      "demoPreview": { "type": "image", "src": "/previews/gpt-image2-2026-10.jpg", "note": "快照 · 2026-10" },
       "tag": "AI 工具",
-      "tech": ["TypeScript", "GPT"]
+      "tech": ["TypeScript", "GPT", "社区"]
     },
     {
       "name": "image2treeModel",
@@ -47,6 +50,15 @@
       "url": "https://github.com/wxhou/blog-builder",
       "tag": "AI 应用",
       "tech": ["TypeScript", "AI"]
+    },
+    {
+      "name": "llm-course-tsinghua",
+      "description": "从零训练大模型 · 自学阶梯——大模型训练自学路径教程站",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/llm-course-tsinghua",
+      "demo": "https://llm-course-tsinghua.pages.dev/",
+      "tag": "学习教程",
+      "tech": ["TypeScript", "LLM"]
     }
   ],
   "more": [

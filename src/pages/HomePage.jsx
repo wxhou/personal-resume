@@ -191,6 +191,121 @@ function CountUp({ value, prefix = '', suffix = '', delay = 0 }) {
   return <span ref={ref}>{reduced ? finalText : `${prefix}0${suffix}`}</span>
 }
 
+// 在线站点卡的悬停预览窗：hover 稳定 180ms 后挂载预览（iframe 实时 / 快照图），点窗进站
+// 仅 hover 设备启用；触屏走「在线访问」直达；窗体对 AT 隐藏（跳转链接已由「在线访问」承担）
+function ProjectCard({ project, index }) {
+  const [previewMounted, setPreviewMounted] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewLoaded, setPreviewLoaded] = useState(false)
+  const [hoverCapable, setHoverCapable] = useState(false)
+  const dwellRef = useRef(null)
+
+  // matchMedia 判断放 effect：SSR 与客户端首帧渲染一致，悬停能力挂载后再确认
+  useEffect(() => {
+    setHoverCapable(window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+    return () => clearTimeout(dwellRef.current)
+  }, [])
+
+  const preview = hoverCapable && !!project.demo
+
+  const onEnter = () => {
+    if (!preview) return
+    clearTimeout(dwellRef.current)
+    dwellRef.current = setTimeout(() => {
+      setPreviewMounted(true)
+      setPreviewOpen(true)
+    }, 180)
+  }
+  const onLeave = () => {
+    clearTimeout(dwellRef.current)
+    setPreviewOpen(false)
+  }
+  const openSite = (e) => {
+    e.preventDefault()
+    window.open(project.demo, '_blank', 'noopener,noreferrer')
+  }
+
+  const demoHost = project.demo ? new URL(project.demo).host : ''
+  const snapshot = project.demoPreview?.type === 'image' ? project.demoPreview : null
+
+  return (
+    <div className="home-project" onPointerEnter={onEnter} onPointerLeave={onLeave}>
+      <a
+        href={project.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="home-project__body"
+      >
+        <div className="home-project__head">
+          <span className="home-project__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <span className="home-project__head-right">
+            {project.demo && <span className="home-project__live">LIVE</span>}
+            <span className="home-project__tag">{project.tag}</span>
+          </span>
+        </div>
+        <div className="home-project__name">{project.name}</div>
+        <div className="home-project__desc">{project.description}</div>
+        <div className="home-project__tech">
+          {project.tech.map(t => (
+            <span key={t} className="home-project__chip">{t}</span>
+          ))}
+        </div>
+      </a>
+      <div className="home-project__links">
+        {project.demo && (
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="home-project__link home-project__link--demo"
+          >
+            在线访问
+            <ExternalLink size={12} />
+          </a>
+        )}
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="home-project__link"
+        >
+          GitHub
+          <ExternalLink size={12} />
+        </a>
+      </div>
+      {preview && (
+        <div
+          className="home-project__preview"
+          data-open={previewOpen}
+          aria-hidden="true"
+          onClick={openSite}
+        >
+          <div className="home-project__preview-bar">
+            <span className="home-project__preview-dots" aria-hidden="true"><i /><i /><i /></span>
+            <span className="home-project__preview-url">{demoHost}</span>
+            {snapshot && <span className="home-project__preview-note">{snapshot.note}</span>}
+          </div>
+          <div className="home-project__preview-view">
+            {previewMounted && snapshot && (
+              <img className="home-project__preview-shot" src={snapshot.src} alt="" />
+            )}
+            {previewMounted && !snapshot && !previewLoaded && (
+              <span className="home-project__preview-loading" aria-hidden="true">LOADING</span>
+            )}
+            {previewMounted && !snapshot && (
+              <iframe
+                src={project.demo}
+                title=""
+                onLoad={() => setPreviewLoaded(true)}
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function HomePage() {
   // GitHub 数据：构建值打底，客户端实时刷新
   const githubStats = useGitHubStats(initialGhStats)
@@ -482,33 +597,11 @@ export default function HomePage() {
 
       {/* ─── 精选项目 ─── */}
       <section id="projects" className="home-section">
-        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="6 个精选开源项目：测试代理、AI 工具与实验作品。" />
+        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="7 个精选开源项目：测试代理、AI 工具、教程站与实验作品。" />
         <Reveal>
         <div className="home-projects">
           {featured.map((project, i) => (
-            <a
-              key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="home-project"
-            >
-              <div className="home-project__head">
-                <span className="home-project__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <span className="home-project__tag">{project.tag}</span>
-              </div>
-              <div className="home-project__name">{project.name}</div>
-              <div className="home-project__desc">{project.description}</div>
-              <div className="home-project__tech">
-                {project.tech.map(t => (
-                  <span key={t} className="home-project__chip">{t}</span>
-                ))}
-              </div>
-              <span className="home-project__link">
-                GitHub
-                <ExternalLink size={12} />
-              </span>
-            </a>
+            <ProjectCard key={project.name} project={project} index={i} />
           ))}
         </div>
         </Reveal>

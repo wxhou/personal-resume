@@ -539,6 +539,21 @@
   box-shadow: var(--shadow-card);
 }
 
+/* 卡片主体为锚（容器是 div，底部需放 GitHub + 在线访问双链接，HTML 不允许嵌套 <a>） */
+.home-project__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-project__links {
+  display: flex;
+  gap: 16px;
+}
+
 .home-project:hover {
   transform: translateY(-3px);
   border-color: rgba(184, 107, 93, 0.35);
@@ -549,6 +564,44 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.home-project__head-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-project__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 10px;
+}
+
+.home-project__live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: home-live-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes home-live-pulse {
+  0%, 100% { opacity: 1 }
+  50% { opacity: 0.3 }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-project__live::before {
+    animation: none;
+  }
 }
 
 .home-project__num {
@@ -607,6 +660,125 @@
   align-items: center;
   gap: 4px;
   letter-spacing: 0.06em;
+}
+
+.home-project__link--demo {
+  background: var(--accent-soft);
+  padding: 2px 10px;
+}
+
+/* ─── 在线站点卡悬停预览窗（活 iframe / 快照图，ProjectCard 按需挂载） ─── */
+/* 窗体盖满卡片：hover 期间卡片即该站点的一扇窗，点击任意处进站；离开即收起 */
+.home-project__preview {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s var(--ease-out),
+              transform 0.3s var(--ease-out);
+  cursor: pointer;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-project__preview[data-open="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.home-project__preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+  flex: none;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--bg-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  color: var(--text-soft);
+}
+
+.home-project__preview-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.home-project__preview-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.4;
+}
+
+.home-project__preview-url {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+.home-project__preview-note {
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  flex: none;
+}
+
+.home-project__preview-view {
+  flex: 1;
+  position: relative;
+  background: #FFFFFF;
+}
+
+.home-project__preview iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.home-project__preview-shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.home-project__preview-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.2em;
+  color: var(--text-soft);
+}
+
+/* 窗体对 iframe 之上置一层透明膜，整窗点击直达站点（iframe 内会吞点击） */
+.home-project__preview-view::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-project__preview {
+    transition: none;
+  }
 }
 
 .home-project__link:hover {
