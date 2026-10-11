@@ -9,7 +9,7 @@
     "build": "vite-react-ssg build && node scripts/postbuild.js",
     "preview": "vite preview",
     "lint": "eslint .",
-    "deploy:cf": "npm run build && cd worker && npx wrangler deploy"
+    "deploy:cf": "npm run build && wrangler pages deploy dist --project-name=wxhou"
   },
   "dependencies": {
     "framer-motion": "^11.0.0",
