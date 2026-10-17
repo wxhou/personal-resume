@@ -731,9 +731,9 @@ export default function HomePage() {
         {/* 落地案例（脱敏）：定位「AI 编程落地」的真实业务证据（评审 P0-2） */}
         <div className="home-case">
           <span className="home-case__tag">CASE · AI 编程落地</span>
-          <h3 className="home-case__title">某城市轨交运营商 · 数字人智能体</h3>
+          <h3 className="home-case__title">某城市轨交运营商 · 智慧运维产品</h3>
           <p className="home-case__desc">
-            基于 Dify 平台开发数字人智能体，集成 RAG 知识库，支撑运营知识问答与换乘推荐——真实业务场景中的端到端 AI 落地实践。
+            为智慧运维产品开发 Agent 智能体，集成 RAG 知识库，支撑故障知识问答与巡检检修——真实业务场景中的端到端 AI 落地实践。
           </p>
         </div>
         </Reveal>
