@@ -99,6 +99,16 @@
       "tech": ["Agent Skill", "深度推理", "npx 安装"]
     },
     {
+      "name": "wechat-markdown",
+      "description": "公众号排版：粘贴 Markdown，一键排版为可直接粘贴到微信公众号编辑器的精致 HTML，33 套主题含合规校验与长图导出",
+      "language": "TypeScript",
+      "url": "https://github.com/wxhou/wechat-markdown",
+      "demo": "https://wechat-markdown.pages.dev/",
+      "demoPreview": { "type": "image", "src": "/previews/wechat-markdown-2026-10.jpg", "note": "快照 · 2026-10" },
+      "tag": "在线工具",
+      "tech": ["Markdown", "公众号排版", "主题"]
+    },
+    {
       "name": "dshdesktop",
       "description": "DeepSeek Harness Desktop：社区独立维护的桌面客户端，一键运行 Harness 无需 Node/Docker",
       "language": "TypeScript",

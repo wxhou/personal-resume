@@ -660,7 +660,7 @@ export default function HomePage() {
 
       {/* ─── 精选项目 ─── */}
       <section id="projects" className="home-section">
-        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="13 个作品：开源工具、AI 应用、桌面客户端与在线站点。" />
+        <SectionHeader index="01" label="SELECTED WORK" title="做过的东西" note="14 个作品：开源工具、AI 应用、桌面客户端与在线站点。" />
         <Reveal>
         <div className="home-projects">
           {featured.map((project, i) => (
