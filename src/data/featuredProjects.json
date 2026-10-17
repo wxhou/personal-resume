@@ -139,19 +139,9 @@
       "url": "https://github.com/wxhou/steward"
     },
     {
-      "name": "cloud-dicom-downloader",
-      "description": "云影像下载器，从在线报告下载 CT、MR 片子的 DICOM 文件",
-      "url": "https://github.com/wxhou/cloud-dicom-downloader"
-    },
-    {
       "name": "knowledge-site",
       "description": "AI 知识课堂",
       "url": "https://github.com/wxhou/knowledge-site"
-    },
-    {
-      "name": "obsidian-note",
-      "description": "个人笔记",
-      "url": "https://github.com/wxhou/obsidian-note"
     }
   ]
 }
