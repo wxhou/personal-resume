@@ -46,14 +46,6 @@
       "tech": ["LLM", "API"]
     },
     {
-      "name": "blog-builder",
-      "description": "AI 驱动的技术文章写作平台",
-      "language": "TypeScript",
-      "url": "https://github.com/wxhou/blog-builder",
-      "tag": "AI 应用",
-      "tech": ["TypeScript", "AI"]
-    },
-    {
       "name": "llm-course-tsinghua",
       "description": "从零训练大模型 · 自学阶梯——大模型训练自学路径教程站",
       "language": "TypeScript",
