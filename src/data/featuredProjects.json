@@ -86,7 +86,7 @@
       "description": "自适应深度推理 Agent Skill：简单问题直答，复杂问题启动完整推理协议，一行命令装进 20+ AI 工具",
       "language": "Python",
       "url": "https://github.com/wxhou/deepthink",
-      "demo": "https://deepthink.wxhou.workers.dev/",
+      "demo": "https://deepthinking.pages.dev/",
       "tag": "AI 工具",
       "tech": ["Agent Skill", "深度推理", "npx 安装"]
     },
