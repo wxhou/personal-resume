@@ -24,6 +24,7 @@
       "description": "Object Sculptor：参考图生成程序化 Three.js 雕塑模型",
       "language": "Python",
       "url": "https://github.com/wxhou/image2treeModel",
+      "demo": "https://object-sculptor.pages.dev/",
       "tag": "实验项目",
       "tech": ["Python", "Three.js"]
     },
