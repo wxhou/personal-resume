@@ -7,6 +7,8 @@ export default function ScrollProgress() {
   useEffect(() => {
     const bar = barRef.current
     if (!bar) return
+    // 支持滚动时间线时由 CSS 驱动，避免两条路径同时写 transform
+    if (typeof CSS !== 'undefined' && CSS.supports('(animation-timeline: scroll())')) return
     let raf = 0
     const update = () => {
       raf = 0

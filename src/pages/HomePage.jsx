@@ -372,12 +372,6 @@ export default function HomePage() {
     document.documentElement.dataset.theme = theme
   }, [theme])
 
-  // 首页强制暖底（亮 #FBF7F1 / 暗 #211D18），离开首页恢复
-  useEffect(() => {
-    document.body.style.background = theme === 'dark' ? '#211D18' : '#FBF7F1'
-    return () => { document.body.style.background = '' }
-  }, [theme])
-
   // 卡片光斑跟随：pointermove 写 --mx/--my，enter/leave 切 is-glowing（参考站 .card 同款）
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -409,6 +403,8 @@ export default function HomePage() {
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) return
+    // 支持滚动时间线时由 CSS 驱动，避免两条路径同时写样式
+    if (typeof CSS !== 'undefined' && CSS.supports('(animation-timeline: scroll()) and (animation-range: entry)')) return
     const heroInner = document.querySelector('.home-hero__inner')
     const heroBg = document.querySelector('.home-hero__bg')
     const scrollHint = document.querySelector('.home-hero__scroll')

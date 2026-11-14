@@ -1,5 +1,5 @@
 /* ─── Home Page：米色暖底 · 暖色粒子纸纹（参考 jingjinglearns.cc） ───
-   米色暖底 #FBF7F1 / 赭红强调 #B86B5D / 暖深字 #34302A
+   米色暖底 #FBF7F1 / 赭红强调 #A85A4C / 暖深字 #34302A
    设计语言：浅米纸纹 + 暖色粒子云 + 顶部椭圆描边 + 衬线大标题
 
    工艺 token（统一决策分辨率）：
@@ -8,6 +8,14 @@
    - 间距基数 8（4/8/12/16/24/32/48/64/96 零例外）
    - 动效 token：进快出慢（in 150ms / out 300ms），位移用 bezier
    - 数字 tabular-nums，焦点环自设计 ── */
+
+/* 首页底色同步到 body：滚动链回弹区与页面同色；data-route 由 index.html 内联脚本在首帧前写入 */
+:root[data-route="home"][data-theme="light"] body {
+  background: #FBF7F1;
+}
+:root[data-route="home"][data-theme="dark"] body {
+  background: #16181D;
+}
 
 .home-page {
   /* ── 色板（暖中性 + 单一赭红强调） ── */
@@ -18,10 +26,10 @@
   --surface-border-strong: rgba(52, 48, 42, 0.14);
   --text-strong: #34302A;
   --text-base: #6E665B;
-  --text-soft: #948A7C;
-  --accent: #B86B5D;
-  --accent-hover: #C2705B;
-  --accent-soft: rgba(184, 107, 93, 0.10);
+  --text-soft: #786F63;
+  --accent: #A85A4C;
+  --accent-hover: #9E5346;
+  --accent-soft: rgba(168, 90, 76, 0.10);
 
   /* 卡片材质（design D2）：暖灰双层软阴影——纸张从桌面微微抬起。
      暖灰取 --text-soft 同族（纯黑影在米底发脏）；暗色覆写保留发丝线（见暗色 token 块） */
@@ -102,6 +110,19 @@
   background: linear-gradient(90deg, #B86B5D, #2d4a3a);
   transform-origin: left;
   transform: scaleX(0);
+}
+
+/* 进度条由滚动时间线驱动；不支持的浏览器由 ScrollProgress 的 JS 监听写同一属性 */
+@keyframes home-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@supports ((animation-timeline: scroll())) {
+  .scroll-progress__bar {
+    animation: home-progress auto linear both;
+    animation-timeline: scroll(root block);
+  }
 }
 
 /* ─── Hero ─── */
@@ -361,6 +382,45 @@
   position: relative;
   z-index: 2;
   transition: opacity var(--dur-out) var(--ease-out);
+}
+
+/* 首屏视差：滚动时间线直接映射 scrollY（0 → 100vh），与旧 JS 的 y/innerHeight 对齐；
+   hero 顶部有 64px 导航偏移，view-timeline 的 exit 区间会从 64px 才起步，故不用 view() */
+@keyframes hero-inner-move {
+  from { transform: translateY(0); }
+  to { transform: translateY(18vh); }
+}
+@keyframes hero-inner-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes hero-bg-move {
+  from { transform: translateY(0); }
+  to { transform: translateY(8vh); }
+}
+@keyframes hero-hint-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@supports ((animation-timeline: scroll()) and (animation-range: entry)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-hero__inner {
+      animation: hero-inner-move linear both, hero-inner-fade linear both;
+      animation-timeline: scroll(root block), scroll(root block);
+      animation-range: 0 100vh, 0 85vh;
+    }
+    .home-hero__bg {
+      animation: hero-bg-move linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+    }
+    .home-hero__scroll {
+      animation: hero-hint-fade linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 60px;
+    }
+  }
 }
 
 /* ─── Section（瑞士印刷：偏移网格 + 大量留白） ─── */
@@ -1104,7 +1164,7 @@
   --surface-border-strong: rgba(232, 236, 244, 0.17);
   --text-strong: #E9ECF1;
   --text-base: #A3ABB8;
-  --text-soft: #707A88;
+  --text-soft: #8A95A4;
   /* accent 在冷底上同色相略提亮：#C97A66 → #CE8574，对比 ~5:1 过 AA */
   --accent: #CE8574;
   --accent-hover: #DB9787;
@@ -1137,6 +1197,11 @@
 /* 亮色 hero 光池仅在亮色语义成立：暗色恢复自有光晕结构（重置为无背景） */
 :root[data-theme="dark"] .home-page .home-hero {
   background: none;
+}
+
+/* 暗色 accent 为浅赭红，白字对比仅 2.9:1，改用深字保证可读 */
+:root[data-theme="dark"] .home-page .home-hero__cta {
+  color: #16181D;
 }
 
 /* 暗色下卡片光斑增强：色随暗色 accent、透明度提高 */
