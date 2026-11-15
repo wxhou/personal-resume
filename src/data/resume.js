@@ -1,22 +1,8 @@
 // ─── Resume Data ───────────────────────────────────────────
-export const personalInfo = {
-  name: 'Bigger蓝莓',
-  title: 'AI应用工程师',
-  email: 'hooupythonic@gmail.com',
-  github: 'https://github.com/wxhou',
-  education: {
-    school: '陕西职业技术学院',
-    major: '工程造价',
-    degree: '大专'
-  }
-}
+// 公开资料在 profile.js；本文件只被 scripts/encrypt-resume.js 引用，不得被 src/ 模块 import
+import { personalInfo, skills, personalLinks } from './profile.js'
 
-export const skills = {
-  ai: ['AI编程', 'LangChain', 'LangGraph', 'Dify', 'Prompt工程', 'RAG技术', 'AI Agent', 'MCP'],
-  backend: ['FastAPI', 'Flask', 'RESTful API', 'Linux', 'SQL'],
-  automation: ['Python + Requests', 'Selenium', 'Airtest', 'Locust', 'Jmeter'],
-  basic: ['Python', 'Git']
-}
+export { personalInfo, skills, personalLinks }
 
 export const experience = [
   {
@@ -77,10 +63,4 @@ export const evaluations = [
   '做人真诚，做事认真负责',
   '进取务实，善于学习自我感兴趣的知识和事物，敢于主动承担自我的职责',
   '细节决定成败'
-]
-
-export const personalLinks = [
-  { name: '博客园', url: 'https://www.cnblogs.com/wxhou' },
-  { name: 'Gitee', url: 'https://gitee.com/wxhou' },
-  { name: 'OpenSpec Playwright', url: 'https://openspec-playwright.pages.dev/' },
 ]

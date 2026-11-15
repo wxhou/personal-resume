@@ -42,7 +42,7 @@ export default function SiteNav() {
                 {anchor.label}
               </a>
             ))}
-            {/* 简历入口暂时隐藏（路由已重定向回首页；恢复时补回 NavLink to="/resume"） */}
+            <Link to="/resume" className="site-nav__link">简历</Link>
           </>
         ) : (
           <>

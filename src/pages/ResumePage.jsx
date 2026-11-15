@@ -4,7 +4,8 @@ import { Head } from 'vite-react-ssg'
 import {
   Phone, Mail, MapPin, Github, ExternalLink,
 } from 'lucide-react'
-import { personalInfo, skills, experience, workProjects, evaluations, personalLinks } from '../data/resume.js'
+import ResumeLock from '../components/ResumeLock.jsx'
+import { unlockResume, ResumeUnlockError } from '../lib/resumeCrypto.js'
 
 const THEMES = [
   { id: 'original', label: '原始' },
@@ -77,6 +78,30 @@ export default function ResumePage() {
     } catch { /* 隐私模式 localStorage 不可用，忽略 */ }
   }, [theme])
 
+  const [resumeData, setResumeData] = useState(null)
+  const [unlocking, setUnlocking] = useState(false)
+  const [unlockError, setUnlockError] = useState('')
+
+  const handleUnlock = async (password) => {
+    setUnlocking(true)
+    setUnlockError('')
+    try {
+      setResumeData(await unlockResume(password))
+    } catch (err) {
+      setUnlockError(err instanceof ResumeUnlockError ? err.message : '解锁失败，请重试')
+    } finally {
+      setUnlocking(false)
+    }
+  }
+
+  const pageHead = (
+    <Head>
+      <title>Bigger蓝莓 - 个人简历</title>
+      <meta name="description" content="Bigger蓝莓的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。" />
+      <meta name="robots" content="noindex,nofollow" />
+    </Head>
+  )
+
   const exportPDF = async () => {
     const element = document.getElementById('resume-a4')
     if (!element) return
@@ -124,12 +149,20 @@ export default function ResumePage() {
     link.click()
   }
 
+  if (!resumeData) {
+    return (
+      <>
+        {pageHead}
+        <ResumeLock onSubmit={handleUnlock} loading={unlocking} error={unlockError} />
+      </>
+    )
+  }
+
+  const { personalInfo, skills, experience, workProjects, evaluations, personalLinks } = resumeData
+
   return (
     <div className="min-h-screen pl-[56px]" style={{ background: 'var(--bg-page)', transition: 'background 300ms ease-out' }}>
-      <Head>
-        <title>Bigger蓝莓 - 个人简历</title>
-        <meta name="description" content="Bigger蓝莓的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。" />
-      </Head>
+      {pageHead}
       {/* Theme Switcher - Left Sidebar */}
       <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
 

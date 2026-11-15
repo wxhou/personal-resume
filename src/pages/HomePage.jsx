@@ -4,7 +4,7 @@ import { Head } from 'vite-react-ssg'
 // 字体子集（构建期 scripts/subset-fonts.js 生成，见 openspec change perf-font-subset-idle-render）
 import '../assets/fonts/index.css'
 import { ArrowRight, ArrowDown, ExternalLink, Github, Mail, Rss, Star, Download, FolderGit2 } from 'lucide-react'
-import { personalInfo, skills, personalLinks } from '../data/resume.js'
+import { personalInfo, skills, personalLinks } from '../data/profile.js'
 import featuredData from '../data/featuredProjects.json'
 import { facts, heroStatement } from '../data/facts.js'
 import ScrollProgress from '../components/ScrollProgress.jsx'
