@@ -1,58 +1,81 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Head } from 'vite-react-ssg'
 import {
   Phone, Mail, MapPin, Github, ExternalLink,
 } from 'lucide-react'
 import ResumeLock from '../components/ResumeLock.jsx'
+import ProfileCard from '../components/ProfileCard.jsx'
+import { resumeName } from '../data/profile.js'
 import { unlockResume, ResumeUnlockError } from '../lib/resumeCrypto.js'
+import './resume.css'
 
 const THEMES = [
-  { id: 'original', label: '原始' },
-  { id: 'dark', label: '精密' },
-  { id: 'editorial', label: '杂志' },
+  { id: 'original', label: '墨蓝' },
+  { id: 'dark', label: '夜航' },
+  { id: 'editorial', label: '纸本' },
   { id: 'geometric', label: '几何' },
 ]
 
+// 画像卡导出档位，统一 16:9
+const CARD_SIZES = [
+  { width: 1920, height: 1080 },
+  { width: 2560, height: 1440 },
+  { width: 3840, height: 2160 },
+]
+
 // ─── Animation Variants ────────────────────────────────────
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay, duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+// reduced：不做位移与淡入，内容直接以最终位置出现
+const fadeUp = (reduced) => (reduced
+  ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+  : {
+    hidden: { opacity: 0, y: 16 },
+    visible: (delay = 0) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay, duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+    })
   })
-}
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    transition: { delay, duration: 0.4, ease: 'easeOut' }
+
+const fadeIn = (reduced) => (reduced
+  ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+  : {
+    hidden: { opacity: 0 },
+    visible: (delay = 0) => ({
+      opacity: 1,
+      transition: { delay, duration: 0.4, ease: 'easeOut' }
+    })
   })
-}
 
 // ─── Theme Switcher ───────────────────────────────────────
 function ThemeSwitcher({ theme, onThemeChange }) {
+  const handleKeyDown = (event) => {
+    const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End']
+    if (!keys.includes(event.key)) return
+    event.preventDefault()
+    const buttons = [...event.currentTarget.querySelectorAll('button')]
+    const current = buttons.findIndex((button) => button.getAttribute('aria-pressed') === 'true')
+    const delta = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1
+    const next = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? THEMES.length - 1
+        : (current + delta + THEMES.length) % THEMES.length
+    onThemeChange(THEMES[next].id)
+    buttons[next]?.focus()
+  }
+
   return (
-    <div className="theme-switcher" role="tablist" aria-label="简历主题切换">
+    <div className="theme-switcher" role="group" aria-label="简历主题" onKeyDown={handleKeyDown}>
       {THEMES.map(t => (
         <button
           key={t.id}
-          role="tab"
-          aria-selected={theme === t.id}
-          aria-label={`切换到${t.label}风格`}
+          type="button"
+          aria-pressed={theme === t.id}
+          aria-label={`切换到${t.label}主题`}
           className={`theme-switcher__btn${theme === t.id ? ' theme-switcher__btn--active' : ''}`}
           onClick={() => onThemeChange(t.id)}
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-              const idx = THEMES.findIndex(x => x.id === theme)
-              const next = e.key === 'ArrowDown'
-                ? THEMES[(idx + 1) % THEMES.length]
-                : THEMES[(idx - 1 + THEMES.length) % THEMES.length]
-              onThemeChange(next.id)
-            }
-          }}
+          tabIndex={theme === t.id ? 0 : -1}
         >
           {t.label}
         </button>
@@ -63,6 +86,10 @@ function ThemeSwitcher({ theme, onThemeChange }) {
 
 // ─── Resume Page ───────────────────────────────────────────
 export default function ResumePage() {
+  const reducedMotion = useReducedMotion()
+  const fadeUpV = fadeUp(reducedMotion)
+  const fadeInV = fadeIn(reducedMotion)
+
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('resume-theme')
@@ -82,6 +109,31 @@ export default function ResumePage() {
   const [unlocking, setUnlocking] = useState(false)
   const [unlockError, setUnlockError] = useState('')
 
+  const cardDialogRef = useRef(null)
+  const cardStageRef = useRef(null)
+  const cardOffscreenRef = useRef(null)
+  const [cardOpen, setCardOpen] = useState(false)
+  const [cardPreviewWidth, setCardPreviewWidth] = useState(1200)
+  const [cardExport, setCardExport] = useState(null)
+  const [cardBusy, setCardBusy] = useState(false)
+
+  // 预览宽度跟随弹层可用宽度，卡片按该宽度等比排版
+  useEffect(() => {
+    if (!cardOpen) return
+    const stage = cardStageRef.current
+    if (!stage) return
+    const update = () => {
+      const style = getComputedStyle(stage)
+      const available = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+      const width = Math.min(Math.floor(available), 1280)
+      if (width > 0) setCardPreviewWidth(width)
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [cardOpen])
+
   const handleUnlock = async (password) => {
     setUnlocking(true)
     setUnlockError('')
@@ -96,8 +148,8 @@ export default function ResumePage() {
 
   const pageHead = (
     <Head>
-      <title>Bigger蓝莓 - 个人简历</title>
-      <meta name="description" content="Bigger蓝莓的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。" />
+      <title>{resumeName} - 个人简历</title>
+      <meta name="description" content={`${resumeName}的在线简历：AI应用工程师，擅长 LangChain、RAG、Dify、AI Agent 开发与自动化测试。`} />
       <meta name="robots" content="noindex,nofollow" />
     </Head>
   )
@@ -106,9 +158,10 @@ export default function ResumePage() {
     const element = document.getElementById('resume-a4')
     if (!element) return
     const { default: html2pdf } = await import('html2pdf.js')
+    const paperBackground = getComputedStyle(element).backgroundColor
     const opt = {
-      margin: 2,
-      filename: 'Bigger蓝莓_个人简历.pdf',
+      margin: 0,
+      filename: `${resumeName}_个人简历.pdf`,
       image: { type: 'png', quality: 1 },
       html2canvas: {
         scale: 2,
@@ -116,7 +169,7 @@ export default function ResumePage() {
         letterRendering: true,
         logging: false,
         windowWidth: 794,
-        backgroundColor: theme === 'dark' ? '#09090B' : theme === 'editorial' ? '#F9F7F4' : '#ffffff',
+        backgroundColor: paperBackground,
         onclone: (clonedDoc) => {
           const el = clonedDoc.getElementById('resume-a4')
           if (el) {
@@ -129,24 +182,75 @@ export default function ResumePage() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     }
-    html2pdf().set(opt).from(element).save()
+    // 纸张按 297mm 渲染会在 jsPDF 里溢出到第二页（余数切片），压到 295mm 保证单页
+    element.classList.add('a4-container--export')
+    element.style.minHeight = '295mm'
+    try {
+      await html2pdf().set(opt).from(element).save()
+    } finally {
+      element.classList.remove('a4-container--export')
+      element.style.minHeight = ''
+    }
   }
 
   const exportImage = async () => {
     const element = document.getElementById('resume-a4')
     if (!element) return
     const { default: html2canvas } = await import('html2canvas')
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      letterRendering: true,
-      logging: false,
-      backgroundColor: theme === 'dark' ? '#09090B' : theme === 'editorial' ? '#F9F7F4' : '#ffffff'
-    })
+    element.classList.add('a4-container--export')
+    let canvas
+    try {
+      canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        logging: false,
+        backgroundColor: getComputedStyle(element).backgroundColor
+      })
+    } finally {
+      element.classList.remove('a4-container--export')
+    }
     const link = document.createElement('a')
-    link.download = 'Bigger蓝莓_个人简历.png'
+    link.download = `${resumeName}_个人简历.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
+  }
+
+  const openCardPreview = () => {
+    const dialog = cardDialogRef.current
+    if (!dialog || dialog.open) return
+    setCardOpen(true)
+    dialog.showModal()
+  }
+
+  // 导出用离屏副本：把卡片按目标像素宽度挂到视口外再截图，不动可见布局
+  const exportProfileCard = async (size) => {
+    if (cardBusy) return
+    setCardBusy(true)
+    try {
+      await document.fonts.ready
+      setCardExport(size)
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      const element = cardOffscreenRef.current?.querySelector('.profile-card')
+      if (!element) return
+      const { default: html2canvas } = await import('html2canvas')
+      // 卡片固定 1920×1080 排版，用 scale 把它渲染成目标像素尺寸
+      const canvas = await html2canvas(element, {
+        scale: size.width / 1920,
+        useCORS: true,
+        logging: false,
+        width: 1920,
+        height: 1080,
+        backgroundColor: getComputedStyle(element).backgroundColor
+      })
+      const link = document.createElement('a')
+      link.download = `${resumeName}-能力画像-${size.width}x${size.height}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } finally {
+      setCardExport(null)
+      setCardBusy(false)
+    }
   }
 
   if (!resumeData) {
@@ -161,16 +265,14 @@ export default function ResumePage() {
   const { personalInfo, skills, experience, workProjects, evaluations, personalLinks } = resumeData
 
   return (
-    <div className="min-h-screen pl-[56px]" style={{ background: 'var(--bg-page)', transition: 'background 300ms ease-out' }}>
+    <div className="resume-page">
       {pageHead}
-      {/* Theme Switcher - Left Sidebar */}
-      <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
-
-      {/* Export Buttons - Top Right (below site nav) */}
-      <div className="fixed top-20 right-4 z-50 flex gap-2">
+      <aside className="resume-tools" aria-label="简历工具">
+        <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
+        <div className="resume-tools__exports">
         <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={reducedMotion ? undefined : { scale: 1.03 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.97 }}
           onClick={exportImage}
           className="export-btn"
           aria-label="导出图片"
@@ -183,8 +285,8 @@ export default function ResumePage() {
           导出图片
         </motion.button>
         <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={reducedMotion ? undefined : { scale: 1.03 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.97 }}
           onClick={exportPDF}
           className="export-btn"
           aria-label="导出PDF"
@@ -197,10 +299,25 @@ export default function ResumePage() {
           </svg>
           导出PDF
         </motion.button>
-      </div>
+        <motion.button
+          whileHover={reducedMotion ? undefined : { scale: 1.03 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.97 }}
+          onClick={openCardPreview}
+          className="export-btn"
+          aria-label="打开能力画像"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="2.5" y="4.5" width="19" height="15" rx="1.5"/>
+            <line x1="2.5" y1="9" x2="21.5" y2="9"/>
+            <line x1="7.5" y1="13" x2="16.5" y2="13"/>
+          </svg>
+          画像
+        </motion.button>
+        </div>
+      </aside>
 
       {/* A4 Paper */}
-      <div id="resume-a4" className="a4-container">
+      <main id="resume-a4" className="a4-container">
         {/* Corner Marks */}
         <div className="a4-corner-mark a4-corner-mark--tl" aria-hidden="true" />
         <div className="a4-corner-mark a4-corner-mark--tr" aria-hidden="true" />
@@ -215,87 +332,77 @@ export default function ResumePage() {
 
         {/* ─── Header ─── */}
         <motion.header
-          variants={fadeUp}
+          variants={fadeUpV}
           initial="hidden"
           animate="visible"
           custom={0}
-          className="mb-5"
+          className="resume-masthead"
         >
-          <div className="flex items-start justify-between">
-            {/* Left: Name & Title */}
-            <div className="flex-1">
-              <motion.div
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                custom={0.1}
-              >
-                <span className="footer-mark block mb-1">No. 001</span>
-                <h1 className="header-name">{personalInfo.name}</h1>
-                <p className="header-title">{personalInfo.title}</p>
-                <p className="header-salary">{personalInfo.salary}</p>
-              </motion.div>
+          <motion.div
+            variants={fadeUpV}
+            initial="hidden"
+            animate="visible"
+            custom={0.1}
+            className="resume-masthead__identity"
+          >
+            <span className="footer-mark block mb-1">No. 001</span>
+            <div className="resume-name">
+              <h1 className="header-name">{personalInfo.name}</h1>
+              <span className="resume-seal" aria-hidden="true">{personalInfo.name.charAt(0)}</span>
             </div>
+            <p className="header-title">{personalInfo.title}</p>
+            <p className="header-salary">¥{personalInfo.salary}</p>
+          </motion.div>
 
-            {/* Right: Avatar */}
-            <motion.div
-              variants={fadeIn}
-              initial="hidden"
-              animate="visible"
-              custom={0.2}
-              className="avatar-wrap"
-              aria-hidden="true"
-            >
+          <motion.div
+            variants={fadeInV}
+            initial="hidden"
+            animate="visible"
+            custom={0.2}
+            className="resume-masthead__meta"
+          >
+            <div className="avatar-wrap" aria-hidden="true">
               <div className="avatar-ring" />
               <div className="avatar-inner">
                 <span className="avatar-monogram">{personalInfo.name.charAt(0)}</span>
               </div>
-            </motion.div>
-          </div>
-
-          {/* Contact Row */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.3}
-            className="flex flex-wrap gap-x-5 gap-y-2 mt-4 pt-4"
-            style={{ borderTop: '1px solid var(--border)' }}
-          >
-            <a href={`tel:${personalInfo.phone}`} className="contact-link">
-              <Phone size={11} strokeWidth={1.5} />
-              {personalInfo.phone}
-            </a>
-            <a href={`mailto:${personalInfo.email}`} className="contact-link">
-              <Mail size={11} strokeWidth={1.5} />
-              {personalInfo.email}
-            </a>
-            <span className="contact-link">
-              <MapPin size={11} strokeWidth={1.5} />
-              {personalInfo.location}
-            </span>
-            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
-              <Github size={11} strokeWidth={1.5} />
-              github.com/wxhou
-            </a>
+            </div>
+            <div className="resume-contact">
+              <a href={`tel:${personalInfo.phone}`} className="contact-link">
+                <Phone size={11} strokeWidth={1.5} />
+                {personalInfo.phone}
+              </a>
+              <a href={`mailto:${personalInfo.email}`} className="contact-link">
+                <Mail size={11} strokeWidth={1.5} />
+                {personalInfo.email}
+              </a>
+              <span className="contact-link">
+                <MapPin size={11} strokeWidth={1.5} />
+                {personalInfo.location}
+              </span>
+              <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="contact-link">
+                <Github size={11} strokeWidth={1.5} />
+                github.com/wxhou
+              </a>
+            </div>
           </motion.div>
         </motion.header>
 
         <div className="section-rule" />
 
         {/* ─── Two-Column Layout ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative" style={{ zIndex: 1 }}>
+        <div className="resume-body">
           {/* ── Left Column ── */}
-          <div className="md:col-span-5 space-y-5">
+          <div className="resume-column resume-column--left">
 
             {/* About */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.15}>
-              <div className="section-label">关于我</div>
+            <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.15}>
+              <h2 className="section-label">关于我</h2>
               <div className="space-y-2">
                 {evaluations.map((text, i) => (
                   <motion.p
                     key={i}
-                    variants={fadeUp}
+                    variants={fadeUpV}
                     initial="hidden"
                     animate="visible"
                     custom={0.25 + i * 0.08}
@@ -308,9 +415,9 @@ export default function ResumePage() {
             </motion.div>
 
             {/* Education */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.2}>
-              <div className="section-label">教育背景</div>
-              <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.3} className="mt-1">
+            <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.2}>
+              <h2 className="section-label">教育背景</h2>
+              <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.3} className="mt-1">
                 <p className="edu-school">{personalInfo.education.school}</p>
                 <p className="edu-meta">{personalInfo.education.major} · {personalInfo.education.degree}</p>
               </motion.div>
@@ -323,13 +430,13 @@ export default function ResumePage() {
               { label: '自动化测试', key: 'automation' },
               { label: '基础技能', key: 'basic' },
             ].map(({ label, key }, idx) => (
-              <motion.div key={key} variants={fadeUp} initial="hidden" animate="visible" custom={0.25 + idx * 0.05}>
-                <div className="section-label">{label}</div>
+              <motion.div key={key} variants={fadeUpV} initial="hidden" animate="visible" custom={0.25 + idx * 0.05}>
+                <h2 className="section-label">{label}</h2>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {skills[key].map((s, i) => (
                     <motion.span
                       key={s}
-                      variants={fadeIn}
+                      variants={fadeInV}
                       initial="hidden"
                       animate="visible"
                       custom={0.35 + idx * 0.05 + i * 0.04}
@@ -343,8 +450,8 @@ export default function ResumePage() {
             ))}
 
             {/* Personal Links */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.5}>
-              <div className="section-label">个人主页</div>
+            <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.5}>
+              <h2 className="section-label">个人主页</h2>
               <div className="space-y-2 mt-1">
                 {personalLinks.map((link, i) => (
                   <motion.a
@@ -352,7 +459,7 @@ export default function ResumePage() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    variants={fadeUp}
+                    variants={fadeUpV}
                     initial="hidden"
                     animate="visible"
                     custom={0.58 + i * 0.06}
@@ -367,16 +474,16 @@ export default function ResumePage() {
           </div>
 
           {/* ── Right Column ── */}
-          <div className="md:col-span-7 space-y-5">
+          <div className="resume-column resume-column--right">
 
             {/* Experience */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.2}>
-              <div className="section-label">工作经历</div>
+            <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.2}>
+              <h2 className="section-label">工作经历</h2>
               <div className="mt-1">
                 {experience[0].roles.map((role, i) => (
                   <motion.div
                     key={role.title}
-                    variants={fadeUp}
+                    variants={fadeUpV}
                     initial="hidden"
                     animate="visible"
                     custom={0.3 + i * 0.12}
@@ -392,13 +499,13 @@ export default function ResumePage() {
             </motion.div>
 
             {/* Projects */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0.35}>
-              <div className="section-label">项目经验</div>
+            <motion.div variants={fadeUpV} initial="hidden" animate="visible" custom={0.35}>
+              <h2 className="section-label">项目经验</h2>
               <div className="mt-1 space-y-4">
                 {workProjects.map((project, i) => (
                   <motion.div
                     key={project.name}
-                    variants={fadeUp}
+                    variants={fadeUpV}
                     initial="hidden"
                     animate="visible"
                     custom={0.45 + i * 0.1}
@@ -414,7 +521,7 @@ export default function ResumePage() {
                       {project.details.map((detail, j) => (
                         <motion.p
                           key={j}
-                          variants={fadeIn}
+                          variants={fadeInV}
                           initial="hidden"
                           animate="visible"
                           custom={0.55 + i * 0.1 + j * 0.05}
@@ -433,26 +540,25 @@ export default function ResumePage() {
 
         {/* ─── Footer ─── */}
         <motion.div
-          variants={fadeUp}
+          variants={fadeUpV}
           initial="hidden"
           animate="visible"
           custom={0.7}
-          className="mt-6 pt-4 flex items-center justify-between"
-          style={{ borderTop: '1px solid var(--border)' }}
+          className="resume-footer"
         >
           <div className="flex gap-3">
             <motion.a
               href={`tel:${personalInfo.phone}`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={reducedMotion ? undefined : { scale: 1.02 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.98 }}
               className="btn-cta btn-cta--primary"
             >
               联系我
             </motion.a>
             <motion.a
               href={`mailto:${personalInfo.email}`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={reducedMotion ? undefined : { scale: 1.02 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.98 }}
               className="btn-cta btn-cta--ghost"
             >
               发送邮件
@@ -462,7 +568,55 @@ export default function ResumePage() {
             © 2026 {personalInfo.name}
           </span>
         </motion.div>
-      </div>
+      </main>
+
+      <dialog
+        ref={cardDialogRef}
+        className="card-dialog"
+        aria-label="能力画像预览"
+        onClose={() => setCardOpen(false)}
+      >
+        <div className="card-dialog__bar">
+          <span className="card-dialog__title">能力画像</span>
+          <button
+            type="button"
+            className="card-dialog__close"
+            onClick={() => cardDialogRef.current?.close()}
+            aria-label="关闭"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="card-dialog__stage" ref={cardStageRef}>
+          <ProfileCard data={resumeData} width={cardPreviewWidth} />
+        </div>
+
+        <div className="card-dialog__sizes">
+          <span className="card-dialog__sizes-label">导出尺寸</span>
+          {CARD_SIZES.map((size) => (
+            <button
+              key={size.width}
+              type="button"
+              className="card-dialog__size"
+              onClick={() => exportProfileCard(size)}
+              disabled={cardBusy}
+              aria-label={`导出 ${size.width}×${size.height} PNG`}
+            >
+              {size.width}×{size.height}
+            </button>
+          ))}
+        </div>
+      </dialog>
+
+      {cardExport && (
+        <div className="card-offscreen" aria-hidden="true" ref={cardOffscreenRef}>
+          <ProfileCard data={resumeData} width={1920} />
+        </div>
+      )}
     </div>
   )
 }

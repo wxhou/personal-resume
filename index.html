@@ -21,11 +21,19 @@
       ]
     }
     </script>
-    <!-- 默认主题：优先本地记忆（用户显式切换过），否则跟随系统 prefers-color-scheme -->
+    <!-- 默认主题：/resume 优先用简历主题记忆（避免首帧站点明暗闪烁）；首页用站点记忆，否则跟随系统 prefers-color-scheme -->
     <script>
       try {
-        var t = localStorage.getItem('siteTheme')
-          || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        var RESUME_THEMES = ['original', 'dark', 'editorial', 'geometric']
+        var isResume = location.pathname === '/resume' || location.pathname.indexOf('/resume/') === 0
+        var t
+        if (isResume) {
+          var r = localStorage.getItem('resume-theme')
+          t = RESUME_THEMES.indexOf(r) > -1 ? r : 'original'
+        } else {
+          t = localStorage.getItem('siteTheme')
+            || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        }
         document.documentElement.dataset.theme = t
       } catch (e) {}
       document.documentElement.dataset.route = location.pathname === '/' ? 'home' : 'page'

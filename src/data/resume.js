@@ -1,8 +1,11 @@
 // ─── Resume Data ───────────────────────────────────────────
 // 公开资料在 profile.js；本文件只被 scripts/encrypt-resume.js 引用，不得被 src/ 模块 import
-import { personalInfo, skills, personalLinks } from './profile.js'
+import { personalInfo as siteInfo, resumeName, skills, personalLinks } from './profile.js'
 
-export { personalInfo, skills, personalLinks }
+export { skills, personalLinks }
+
+// 加密载荷里的姓名用真名，站点品牌仍是 profile.js 的笔名
+export const personalInfo = { ...siteInfo, name: resumeName }
 
 export const experience = [
   {
@@ -31,7 +34,7 @@ export const workProjects = [
     name: 'AI大模型室内定位系统',
     description: '基于ibeacon蓝牙位置信息的室内定位服务，通过AI编程优化算法提升定位精度',
     details: [
-      '负责AI定位算法在业务场景中的应用落地，优化室内定位精度',
+      '负责三角定位、指纹匹配、卡尔曼滤波与最小二乘优化的业务落地，提升室内定位精度',
       '使用Python进行AI模型的数据预处理和后处理脚本开发',
       '设计开发室内定位数据采集与分析平台',
       '通过Locust进行并发压测，性能优化'

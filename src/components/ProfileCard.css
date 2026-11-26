@@ -1,0 +1,222 @@
+/* 能力画像卡片：1920×1080 定宽设计，缩放交给外层 transform 与 html2canvas 的 scale。
+   这里全部用 px——html2canvas 解析不了 calc(var(--x) * N)，会导致间距丢失。 */
+
+.profile-card-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 1920px;
+  height: 1080px;
+  padding: 66px 96px;
+  overflow: hidden;
+  transform-origin: top left;
+  background: var(--resume-paper);
+  color: var(--resume-ink);
+  font-family: var(--resume-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.profile-card *,
+.profile-card *::before,
+.profile-card *::after { box-sizing: border-box; }
+
+.profile-card :where(p, dl, dd) { margin: 0; }
+
+/* ─── 顶栏 ─── */
+.profile-card__topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--resume-font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--resume-ink-muted);
+}
+.profile-card__topbar em { font-style: normal; color: var(--resume-accent); }
+
+/* ─── 两栏 ─── */
+.profile-card__cols {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  padding-top: 52px;
+}
+
+/* ─── 左：身份 ─── */
+.profile-card__identity {
+  flex: 0 0 560px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* html2canvas 用字体自带行盒（≈1.8em）排这行大字，浏览器侧显式设成同一高度，两边才一致 */
+.profile-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.profile-card__name {
+  font-family: 'Songti SC', 'Noto Serif SC', serif;
+  font-size: 148px;
+  font-weight: 600;
+  line-height: 266px;
+  letter-spacing: 0.02em;
+}
+
+.profile-card__seal {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  transform: rotate(-4deg);
+  background: var(--resume-signal);
+  color: var(--resume-paper);
+  font-family: 'Songti SC', 'Noto Serif SC', serif;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid var(--resume-paper);
+}
+
+.profile-card__role {
+  margin-top: 26px;
+  font-family: var(--resume-font-ui);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--resume-accent);
+}
+.profile-card__role span { color: var(--resume-ink-muted); font-weight: 400; letter-spacing: 0.01em; }
+
+.profile-card__hairline {
+  margin: 34px 0 26px;
+  height: 1px;
+  background: var(--rule);
+}
+
+.profile-card__statement {
+  max-width: 470px;
+  font-size: 21px;
+  font-weight: 300;
+  line-height: 1.95;
+  color: var(--resume-ink-soft);
+}
+.profile-card__statement b { font-weight: 600; color: var(--resume-ink); }
+
+.profile-card__facts {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.profile-card__facts > div { display: flex; align-items: baseline; gap: 20px; }
+.profile-card__facts dt {
+  flex: 0 0 132px;
+  font-family: var(--resume-font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--resume-signal);
+}
+.profile-card__facts dd {
+  font-size: 17px;
+  color: var(--resume-ink-soft);
+}
+.profile-card__facts dd strong { font-weight: 600; color: var(--resume-ink); }
+
+/* ─── 右：能力剖面 ─── */
+.profile-card__caps {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: 76px;
+  padding-left: 72px;
+  border-left: 1px solid var(--rule);
+}
+
+.profile-card__caps-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 14px;
+  font-family: var(--resume-font-mono);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--resume-ink-muted);
+}
+.profile-card__caps-head em { font-style: normal; color: var(--resume-signal); }
+
+.profile-card__row {
+  flex: 1;
+  display: flex;
+  gap: 28px;
+  min-height: 0;
+  padding: 22px 0 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.profile-card__row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.profile-card__idx {
+  flex: 0 0 34px;
+  padding-top: 9px;
+  font-family: var(--resume-font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--resume-signal);
+}
+
+.profile-card__row-body { flex: 1; min-width: 0; }
+
+.profile-card__row-title {
+  font-family: var(--resume-font-ui);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.profile-card__chips {
+  margin-top: 12px;
+  font-family: var(--resume-font-mono);
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--resume-ink-soft);
+}
+.profile-card__chips i {
+  font-style: normal;
+  padding: 0 9px;
+  color: var(--resume-ink-muted);
+  opacity: 0.55;
+}
+
+.profile-card__proof {
+  margin-top: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--resume-ink-muted);
+}
+.profile-card__proof::before {
+  content: '';
+  flex: 0 0 24px;
+  height: 1px;
+  background: var(--resume-signal);
+}

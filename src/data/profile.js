@@ -1,7 +1,7 @@
 // 首页与简历共用的公开资料；真正的简历私有数据在 resume.js（仅加密脚本引用）
 export const personalInfo = {
   name: 'Bigger蓝莓',
-  title: 'AI应用工程师',
+  title: 'AI应用工程师 / FDE',
   email: 'hooupythonic@gmail.com',
   github: 'https://github.com/wxhou',
   education: {
@@ -10,6 +10,9 @@ export const personalInfo = {
     degree: '大专'
   }
 }
+
+// 简历页用真名；name 是站点品牌（首页、站点导航），两者不同
+export const resumeName = '侯伟轩'
 
 export const skills = {
   ai: ['AI编程', 'LangChain', 'LangGraph', 'Dify', 'Prompt工程', 'RAG技术', 'AI Agent', 'MCP'],

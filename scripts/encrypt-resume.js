@@ -42,7 +42,8 @@ async function main() {
 
   const password = process.env.RESUME_PASSWORD
   if (!password) fail('缺少 RESUME_PASSWORD（写入 .env.local，或用 read -s 输入后 export）')
-  if (password.length < 8) fail('RESUME_PASSWORD 至少 8 个字符（建议 12 位以上随机串）')
+  // 下限 4 位；更短等于没有保护
+  if (password.length < 4) fail('RESUME_PASSWORD 至少 4 个字符')
 
   const { personalInfo, skills, experience, workProjects, evaluations, personalLinks } =
     await import('../src/data/resume.js')

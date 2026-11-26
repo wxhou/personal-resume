@@ -11,9 +11,12 @@ export default function ResumeLock({ onSubmit, loading, error }) {
   }
 
   return (
-    <div className="resume-lock">
+    <main className="resume-lock">
       <form className="resume-lock__card" onSubmit={submit}>
-        <h1 className="resume-lock__title">简历已加密</h1>
+        <div className="resume-lock__head">
+          <h1 className="resume-lock__title">简历已加密</h1>
+          <span className="resume-lock__seal" aria-hidden="true">莓</span>
+        </div>
         <p className="resume-lock__desc">输入访问密码后查看简历。</p>
         <label className="resume-lock__label" htmlFor="resume-password">访问密码</label>
         <input
@@ -32,6 +35,6 @@ export default function ResumeLock({ onSubmit, loading, error }) {
           {loading ? '解密中…' : '解锁'}
         </button>
       </form>
-    </div>
+    </main>
   )
 }

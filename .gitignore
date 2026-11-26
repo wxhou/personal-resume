@@ -65,3 +65,12 @@ playwright.config.ts
 # 字体子集化产物（scripts/subset-fonts.js 生成，源字体入库、产物不入库）
 src/assets/fonts/*.woff2
 src/assets/fonts/index.css
+# openspec-pw: begin managed block
+.agents/skills/opsx-e2e/
+.cline/
+.codebuddy/
+CODEBUDDY.md
+app-exploration.md
+opencode.json
+playwright/.auth/
+# openspec-pw: end managed block
