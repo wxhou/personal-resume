@@ -506,9 +506,9 @@ export default function HomePage() {
   return (
     <div className="home-page fx-cursor">
       <Head>
-        <title>Bigger蓝莓 - AI应用工程师</title>
+        <title>Bigger蓝莓 - AI应用工程师 / FDE</title>
         <meta name="description" content="Bigger蓝莓的个人主页：AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
-        <meta property="og:title" content="Bigger蓝莓 - AI应用工程师" />
+        <meta property="og:title" content="Bigger蓝莓 - AI应用工程师 / FDE" />
         <meta property="og:description" content="AI应用工程师，专注 AI 应用开发（LangChain、RAG、Dify、AI Agent），分享开源项目与技术文章。" />
         <meta property="og:image" content="https://wxhou.pages.dev/og-image.png" />
         <meta property="og:image:width" content="1200" />
@@ -816,7 +816,7 @@ export default function HomePage() {
       <footer className="home-footer">
         <span>{heroStatement.headline} · {personalInfo.name}</span>
         <span className="home-footer__note" title="博客园最近一篇：2022-10">博客 2022 年后停更了——别催，在想大的</span>
-        <span>© 2026 {personalInfo.name} · BUILT WITH AI, SHIPPED BY HUMAN</span>
+        <span>© {new Date().getFullYear()} {personalInfo.name} · BUILT WITH AI, SHIPPED BY HUMAN</span>
       </footer>
     </div>
   )

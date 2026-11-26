@@ -755,6 +755,11 @@
   max-height: 296.5mm;
   overflow: hidden;
 }
+/* 入场动画未跑完就导出会截到半透明或缺失的区块，导出副本直接取终态 */
+.a4-container--export [style] {
+  opacity: 1 !important;
+  transform: none !important;
+}
 /* html2canvas 重建行盒时姓名块比浏览器矮约 22px，职位行会压到姓名的下伸部；
    导出时补回这段间距（仅影响导出，不改变屏幕排版） */
 .a4-container--export .header-title {
@@ -1002,6 +1007,11 @@
   .resume-body,
   .resume-footer,
   .section-rule { position: static; }
+  /* 入场动画停在中途时打印会留下半透明与位移；打印态直接取终态 */
+  #resume-a4 [style] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   .project-card { break-inside: avoid; }
   * {
     -webkit-print-color-adjust: exact !important;

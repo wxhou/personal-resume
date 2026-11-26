@@ -162,7 +162,8 @@ export default function ResumePage() {
     const opt = {
       margin: 0,
       filename: `${resumeName}_个人简历.pdf`,
-      image: { type: 'png', quality: 1 },
+      // PNG 在 jsPDF 里近乎不压缩，整页 2× 位图会到 10MB；JPEG 0.95 肉眼无差
+      image: { type: 'jpeg', quality: 0.95 },
       html2canvas: {
         scale: 2,
         useCORS: true,
@@ -565,7 +566,7 @@ export default function ResumePage() {
             </motion.a>
           </div>
           <span className="footer-mark">
-            © 2026 {personalInfo.name}
+            © {new Date().getFullYear()} {personalInfo.name}
           </span>
         </motion.div>
       </main>
